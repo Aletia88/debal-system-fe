@@ -4,7 +4,7 @@ import { NavbarDemo } from "./components/header";
 export default function Home() {
   return (
     <>
-    <NavbarDemo />
+    {/* <NavbarDemo /> */}
    <p className='text-red-400'>main</p></>
   );
 }
