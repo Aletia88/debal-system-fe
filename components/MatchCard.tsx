@@ -52,7 +52,7 @@ export const MatchCard = ({ user, onMessageClick, onLikeToggle }: MatchCardProps
       >
         <div className="relative h-48">
           <Image 
-            src={user.image || "/placeholder-user.jpg"} 
+            src={user.image || "/image.png"} 
             alt={user.name} 
             fill 
             className="object-cover" 
@@ -117,7 +117,7 @@ export const MatchCard = ({ user, onMessageClick, onLikeToggle }: MatchCardProps
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative h-64 w-full rounded-lg overflow-hidden">
               <Image
-                src={user.image || "/placeholder-user.jpg"}
+                src={user.image || "/image.png"}
                 alt={user.name}
                 fill
                 className="object-cover"

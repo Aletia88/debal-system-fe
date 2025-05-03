@@ -18,7 +18,7 @@ export const UserAvatar = ({ name, image, className = '', size = 'md' }: UserAva
 
   return (
     <Avatar className={`${sizeClasses[size]} ${className}`}>
-      <AvatarImage src={image || "/placeholder-user.jpg"} />
+      <AvatarImage src={image || "/image.png"} />
       <AvatarFallback>
         {name.split(' ').map(n => n[0]).join('')}
       </AvatarFallback>

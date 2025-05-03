@@ -70,14 +70,14 @@ export default function ProfilePage() {
       <div className="bg-white py-6 px-4 text-center">
         <h1 className="text-2xl font-bold text-purple-900">My Profile</h1>
         <p className="text-gray-500 mt-1">Holla!, Fill in the details to complete sign up</p>
-        <Button className="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-8 py-2 rounded-md">Edit Profile</Button>
+        {/* <Button className="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-8 py-2 rounded-md">Edit Profile</Button> */}
       </div>
 
       {/* Profile Banner */}
-      <div className="bg-purple-900 py-12 px-4 text-center text-white relative">
+      <div className="bg-purple-900 py-12 mt-5 px-4 text-center text-white relative">
         <div className="absolute left-1/2 -top-12 transform -translate-x-1/2">
-          <Avatar className="h-24 w-24 border-4 border-white">
-            <AvatarImage src="/placeholder.svg?height=96&width=96" alt="Profile" />
+          <Avatar className="h-24 w-24 border-4 border-white bg-cover">
+            <AvatarImage src="/image.png" alt="Profile" />
             <AvatarFallback>RU</AvatarFallback>
           </Avatar>
         </div>
@@ -381,7 +381,7 @@ export default function ProfilePage() {
       {/* Edit Modals */}
       {/* Personal Information Modal */}
       <Dialog open={personalInfoModal} onOpenChange={setPersonalInfoModal}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Personal Information</DialogTitle>
           </DialogHeader>
@@ -519,7 +519,7 @@ export default function ProfilePage() {
 
       {/* Lifestyle Information Modal */}
       <Dialog open={lifestyleModal} onOpenChange={setLifestyleModal}>
-        <DialogContent className="sm:max-w-xl">
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Lifestyle Information</DialogTitle>
           </DialogHeader>
@@ -633,7 +633,7 @@ export default function ProfilePage() {
 
       {/* Neighborhood Information Modal */}
       <Dialog open={neighborhoodModal} onOpenChange={setNeighborhoodModal}>
-        <DialogContent className="sm:max-w-xl">
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Neighborhood Information</DialogTitle>
           </DialogHeader>
@@ -688,7 +688,7 @@ export default function ProfilePage() {
 
       {/* Room Information Modal */}
       <Dialog open={roomInfoModal} onOpenChange={setRoomInfoModal}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Room Information</DialogTitle>
           </DialogHeader>

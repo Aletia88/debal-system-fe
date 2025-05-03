@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Stepper, Button, Group, Flex, Box, TextInput, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import PersonalInfo from './components/personal-Info';
 
 export default function Form() {
   const [active, setActive] = useState(0);
@@ -35,11 +36,11 @@ export default function Form() {
     if (nextStep > 3 || nextStep < 0) return;
     
     // Validate current step before proceeding
-    if (nextStep > active) {
-      if (active === 0 && !accountForm.isValid()) return;
-      if (active === 1 && !verifyForm.isValid()) return;
-      if (active === 2 && !profileForm.isValid()) return;
-    }
+    // if (nextStep > active) {
+    //   if (active === 0 ) return;
+    //   if (active === 1 ) return;
+    //   if (active === 2) return;
+    // }
 
     setActive(nextStep);
     setHighestStepVisited((hSC) => Math.max(hSC, nextStep));
@@ -53,18 +54,18 @@ export default function Form() {
       <Box>
         <Stepper active={active} onStepClick={setActive} orientation="vertical" className='pr-5'>
           <Stepper.Step
-            label="Create account"
-            description="Set up your credentials"
+            label="Step 1"
+            description="Personal Information"
             allowStepSelect={shouldAllowSelectStep(0)}
           />
           <Stepper.Step
-            label="Verify email"
-            description="Enter verification code"
+            label="Step 2"
+            description="City/Neigboorhood"
             allowStepSelect={shouldAllowSelectStep(1)}
           />
           <Stepper.Step
-            label="Complete profile"
-            description="Tell us about yourself"
+            label="Step 3"
+            description="Lifestyle Information"
             allowStepSelect={shouldAllowSelectStep(2)}
           />
           {/* <Stepper.Completed /> */}
@@ -72,24 +73,9 @@ export default function Form() {
       </Box>
 
       {/* Form content on the right */}
-      <Box style={{ flex: 1, minWidth: 400 }} className='border border-t-2 border-t-[#9F12E0] p-5 bg-white'>
+      <Box style={{ flex: 1 }} >
         {active === 0 && (
-          <form onSubmit={accountForm.onSubmit(() => handleStepChange(1))}>
-            <Text size="xl" fw={500} mb="md">Create Account</Text>
-            <TextInput
-              label="Email"
-              placeholder="your@email.com"
-              {...accountForm.getInputProps('email')}
-              mb="sm"
-            />
-            <TextInput
-              label="Password"
-              type="password"
-              placeholder="At least 6 characters"
-              {...accountForm.getInputProps('password')}
-              mb="md"
-            />
-          </form>
+         <PersonalInfo />
         )}
 
         {active === 1 && (
@@ -131,16 +117,17 @@ export default function Form() {
           </div>
         )}
 
-        <Group justify="flex-end" mt="xl">
+        <Group justify="center" mt="sm">
           {active > 0 && (
             <Button variant="default" onClick={() => handleStepChange(active - 1)}>
               Back
             </Button>
           )}
           {active < 3 ? (
+             <div className="mt-2 flex justify-center">
             <Button onClick={() => handleStepChange(active + 1)}>
-              {active === 2 ? 'Complete' : 'Next'}
-            </Button>
+              {active === 2 ? 'Complete' : 'Save and Continue'}
+            </Button></div>
           ) : (
             <Button onClick={() => alert('Form submitted!')}>Submit</Button>
           )}

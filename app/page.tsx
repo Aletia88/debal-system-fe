@@ -10,10 +10,10 @@ import { Chat } from '@/types/chat';
 import FilterSidebar from '@/components/filter-sidebar';
 
 const matches = [
-  { id: 1, name: "Rebecca Oyebanji", matchPercentage: 80, image: "/placeholder-user.jpg" },
-  { id: 2, name: "Alex Johnson", matchPercentage: 75, image: "/placeholder-user.jpg" },
-  { id: 3, name: "Sarah Williams", matchPercentage: 90, image: "/placeholder-user.jpg" },
-  { id: 4, name: "Michael Brown", matchPercentage: 65, image: "/placeholder-user.jpg" },
+  { id: 1, name: "Rebecca Oyebanji", matchPercentage: 80, image: "/image.png" },
+  { id: 2, name: "Alex Johnson", matchPercentage: 75, image: "/image.png" },
+  { id: 3, name: "Sarah Williams", matchPercentage: 90, image: "/image.png" },
+  { id: 4, name: "Michael Brown", matchPercentage: 65, image: "/image.png" },
 ];
 
 const chats: Chat[] = [
@@ -76,7 +76,7 @@ export default function MatchesPage() {
                 id: 1,
                 name: "Rebecca Oyebanji",
                 matchPercentage: 80,
-                image: "/placeholder-user.jpg",
+                image: "/image.png",
                 age: 28,
                 location: "New York",
                 bio: "Love hiking and photography. Looking for someone to share adventures with!",
