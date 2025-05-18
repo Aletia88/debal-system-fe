@@ -19,7 +19,7 @@ export default function Home() {
   const [message, setMessage] = useState("");
 
   // Fetch conversations
-  const { data: conversations = [], isLoading: isLoadingConversations } = useGetConversationsQuery({});
+  const { data: conversations, isLoading: isLoadingConversations } = useGetConversationsQuery({});
 
   // Fetch messages for active conversation
   const { data: messages = [], isLoading: isLoadingMessages } = useGetConversationMessagesQuery(activeChat || "", {
@@ -65,7 +65,11 @@ export default function Home() {
   const handleSendMessage = async () => {
     if (message.trim() && activeChat) {
       try {
-        await sendMessage({ conversationId: activeChat, content: message });
+        await sendMessage({ conversationId: activeChat, content: { 
+          content: message,
+          messageType: "text", // Explicitly set message type
+          conversationId: activeChat 
+        } });
         setMessage("");
       } catch (error) {
         console.error("Failed to send message:", error);
@@ -78,7 +82,8 @@ export default function Home() {
     if (selectedUser) {
       try {
         const result = await createConversation(selectedUser).unwrap();
-        setActiveChat(result.id); // Switch to the new conversation
+        console.log(result)
+        setActiveChat(result.data._id); // Switch to the new conversation
         setShowNewChatDialog(false);
         setSearchQuery("");
         setSelectedUser(null);
@@ -214,22 +219,22 @@ export default function Home() {
                   <div className="p-4 text-center">Loading conversations...</div>
                 ) : (
                   <div className="divide-y">
-                    {conversations.map((conversation) => (
+                    {conversations?.data.map((conversation) => (
                       <div 
                         key={conversation.id}
-                        className={`p-3 hover:bg-gray-50 cursor-pointer ${activeChat === conversation.id ? 'bg-purple-50' : ''}`}
-                        onClick={() => setActiveChat(conversation.id)}
+                        className={`p-3 hover:bg-gray-50 cursor-pointer ${activeChat === conversation._id ? 'bg-purple-50' : ''}`}
+                        onClick={() => setActiveChat(conversation._id)}
                       >
                         <div className="flex items-start space-x-3">
                           <Avatar className="h-10 w-10 flex-shrink-0">
                             <AvatarImage src={conversation.avatar || "/placeholder.svg?height=40&width=40"} />
                             <AvatarFallback>
-                              {conversation.name.split(' ').map(n => n[0]).join('')}
+                              {conversation.participant.name.split(' ').map(n => n[0]).join('')}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
                             <div className="flex justify-between items-center">
-                              <h4 className="font-medium truncate">{conversation.name}</h4>
+                              <h4 className="font-medium truncate">{conversation.participant.name}</h4>
                               {conversation.unreadCount > 0 && (
                                 <span className="text-purple-600 bg-purple-100 rounded-full w-5 h-5 flex items-center justify-center text-xs">
                                   {conversation.unreadCount}
@@ -270,12 +275,12 @@ export default function Home() {
                     <Avatar className="h-10 w-10">
                       <AvatarImage src="/placeholder.svg?height=40&width=40" />
                       <AvatarFallback>
-                        {conversations.find(c => c.id === activeChat)?.name.split(' ').map(n => n[0]).join('')}
+                        {conversations.data.participant?.find(c => c._id === activeChat)?.name.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <h4 className="font-medium">
-                        {conversations.find(c => c.id === activeChat)?.name}
+                        {conversations.data.participant?.find(c => c._id === activeChat)?.name}
                       </h4>
                       <p className="text-xs text-green-500">Online</p>
                     </div>

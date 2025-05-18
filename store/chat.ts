@@ -41,9 +41,9 @@ export const ChatApi = createApi({
     // Send a message
     sendMessage: builder.mutation({
       query: ({ conversationId, content }) => ({
-        url: `/chat/${conversationId}/messages`,
+        url: `/chat/${conversationId}/send-message`,
         method: "POST",
-        body: { content }
+        body:  content 
       }),
       invalidatesTags: (result, error, { conversationId }) => [
         { type: "Message", id: conversationId }
@@ -62,7 +62,7 @@ export const ChatApi = createApi({
 
     // Get user conversations list
     getConversations: builder.query({
-      query: () => "/chat/conversations",
+      query: () => "/chat/users/conversations",
       providesTags: ["Conversation"]
     }),
     getUsers: builder.query({
