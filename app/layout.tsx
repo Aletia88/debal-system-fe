@@ -46,36 +46,35 @@ const violetBrand = [
   '#520D74',
 ] as const;
 
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Get the current pathname
+ // Adjust this if your login route is different
+
   return (
     <html lang="en">
-      <body
-      className='bg-[#f5f5f5]'
-        // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <MantineProvider defaultColorScheme="light"   theme={{
+      <body className='bg-[#f5f5f5]'>
+        <MantineProvider 
+          defaultColorScheme="light"   
+          theme={{
             colors: {
               violetBrand,
             },
             primaryColor: 'violetBrand',
           }}
-       
         >
-            <ModalsProvider>
-              <Providers>
-                {/* <ProtectedRoute> */}
-                  <Notifications />
-                      <NavbarDemo />
-                  
-                  {children}
-                {/* </ProtectedRoute> */}
-              </Providers>
-            </ModalsProvider>
-          </MantineProvider>
+          <ModalsProvider>
+            <Providers>
+             
+              {children}
+            </Providers>
+          </ModalsProvider>
+        </MantineProvider>
       </body>
     </html>
   );

@@ -19,8 +19,8 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     // Check for loading state and authentication
     if (!loading) {
-      if (!isAuthenticated && pathname !== "/" ) {
-        router.push("/"); // Redirect to login if not authenticated
+      if (!isAuthenticated && pathname !== "/signup") {
+        router.push("/login"); // Redirect to login if not authenticated
       }
     }
   }, [isAuthenticated, loading, pathname, router]);
@@ -45,7 +45,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   // Render children if authenticated or if on login page
   return (
     <>
-      {isAuthenticated || pathname === "/" 
+      {isAuthenticated || pathname === "/login" || pathname === "/signup" 
         ? children
         : null}
     </>

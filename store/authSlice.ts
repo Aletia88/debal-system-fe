@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface AuthState {
   isAuthenticated: boolean;
-  accessToken: string | null;
+  token: string | null;
   refreshToken: string | null;
   user: any; // Adjust to the specific structure of your user object
   error: string | null;
@@ -11,9 +11,9 @@ interface AuthState {
 }
 
 // Safely access localStorage on the client side
-const getAccessToken = () => {
+const gettoken = () => {
   if (typeof window !== "undefined") {
-    return localStorage.getItem("accessToken");
+    return localStorage.getItem("token");
   }
   return null;
 };
@@ -42,8 +42,8 @@ const getAuthUser = () => {
 
 // Initialize state from localStorage for persistence
 const initialState: AuthState = {
-  isAuthenticated: Boolean(getAccessToken()),
-  accessToken: getAccessToken(),
+  isAuthenticated: Boolean(gettoken()),
+  token: gettoken(),
   refreshToken: getRefreshToken(),
   user: getAuthUser(),
   error: null,
@@ -57,21 +57,21 @@ const authSlice = createSlice({
     loginSuccess: (
       state,
       action: PayloadAction<{
-        accessToken: string;
+        token: string;
         refreshToken: string;
         user: any;
       }>
     ) => {
       state.isAuthenticated = true;
-      state.accessToken = action.payload.accessToken;
+      state.token = action.payload.token;
       state.refreshToken = action.payload.refreshToken;
       state.user = action.payload.user;
       state.error = null;
 
       // Store data in localStorage
       if (typeof window !== "undefined") {
-        if (action.payload.accessToken) {
-          localStorage.setItem("accessToken", action.payload.accessToken);
+        if (action.payload.token) {
+          localStorage.setItem("token", action.payload.token);
         }
         if (action.payload.refreshToken) {
           localStorage.setItem("refreshToken", action.payload.refreshToken);
@@ -83,14 +83,14 @@ const authSlice = createSlice({
     },
     loginFailure: (state, action: PayloadAction<string>) => {
       state.isAuthenticated = false;
-      state.accessToken = null;
+      state.token = null;
       state.refreshToken = null;
       state.user = null;
       state.error = action.payload;
 
       // Clear localStorage on failure
       if (typeof window !== "undefined") {
-        localStorage.removeItem("accessToken");
+        localStorage.removeItem("token");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("AuthUser");
       }
@@ -98,14 +98,14 @@ const authSlice = createSlice({
     },
     logout: (state) => {
       state.isAuthenticated = false;
-      state.accessToken = null;
+      state.token = null;
       state.refreshToken = null;
       state.user = null;
       state.error = null;
 
       // Clear all localStorage data on logout
       if (typeof window !== "undefined") {
-        localStorage.removeItem("accessToken");
+        localStorage.removeItem("token");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("AuthUser");
       }
@@ -113,16 +113,16 @@ const authSlice = createSlice({
     setAuthTokens: (
       state,
       action: PayloadAction<{
-        accessToken: string;
+        token: string;
         refreshToken: string;
       }>
     ) => {
-      state.accessToken = action.payload.accessToken;
+      state.token = action.payload.token;
       state.refreshToken = action.payload.refreshToken;
 
       // Update tokens in localStorage
       if (typeof window !== "undefined") {
-        localStorage.setItem("accessToken", action.payload.accessToken);
+        localStorage.setItem("token", action.payload.token);
         localStorage.setItem("refreshToken", action.payload.refreshToken);
       }
     },

@@ -10,23 +10,36 @@ import {
   MobileNavToggle,
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
+import { logout } from "@/store/authSlice";
+import { useGetProfileQuery } from "@/store/profile";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 
 export function NavbarDemo() {
+
+  const dispatch = useDispatch()
+  const router = useRouter()
+  const { data, isLoading, isError, refetch } = useGetProfileQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(logout())
+      router.push("/login");
+      // Manually refetch after logout to clear cached data
+      refetch();
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
   const navItems = [
-    {
-      name: "Home",
-      link: "#features",
-    },
-    {
-      name: "About Us",
-      link: "#pricing",
-    },
-    {
-      name: "Find Room",
-      link: "#contact",
-    },
+    { name: "Home", link: "#features" },
+    { name: "About Us", link: "#pricing" },
+    { name: "Find Room", link: "#contact" },
   ];
+
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -38,8 +51,8 @@ export function NavbarDemo() {
           <NavbarLogo />
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
-            <NavbarButton variant="secondary">Login</NavbarButton>
-            <NavbarButton variant="primary">Book a call</NavbarButton>
+            <NavbarButton onClick={handleLogout} variant="secondary">logout</NavbarButton>
+            <NavbarButton variant="primary">{data?.user.name}</NavbarButton>
           </div>
         </NavBody>
 

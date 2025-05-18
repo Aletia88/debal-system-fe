@@ -1,42 +1,203 @@
 'use client'
 import Image from "next/image";
-import { Bell, Search, ChevronDown, Minimize2, X, Eye, Heart, MessageCircle, Send, Phone, Check, Maximize2, Menu } from "lucide-react";
+import { Bell, Search, ChevronDown, Minimize2, X, Eye, Heart, MessageCircle, Send, Phone, Check, Maximize2, Menu, Plus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Draggable from "react-draggable";
-import { useState } from "react";
+// import Draggable from "react-draggable";
+
+// import { useGetConversationsQuery, useGetConversationMessagesQuery, useSendMessageMutation } from 
+import { useEffect, useState } from "react";
+import { useGetConversationsQuery, useGetConversationMessagesQuery, useSendMessageMutation, useCreateConversationMutation, useGetUsersQuery } from "@/store/chat";
+// ... other imports
 
 export default function Home() {
   const [chatOpen, setChatOpen] = useState(true);
   const [minimized, setMinimized] = useState(false);
-  const [activeChat, setActiveChat] = useState<number | null>(3);
+  const [activeChat, setActiveChat] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [message, setMessage] = useState("");
+
+  // Fetch conversations
+  const { data: conversations = [], isLoading: isLoadingConversations } = useGetConversationsQuery({});
+
+  // Fetch messages for active conversation
+  const { data: messages = [], isLoading: isLoadingMessages } = useGetConversationMessagesQuery(activeChat || "", {
+    skip: !activeChat
+  });
+
+  // Send message mutation
+  const [sendMessage] = useSendMessageMutation();
 
   const toggleChat = () => setChatOpen(!chatOpen);
   const toggleMinimize = () => setMinimized(!minimized);
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const [showNewChatDialog, setShowNewChatDialog] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  const chats = [
-    { id: 1, name: "Rebecca Oyebanji", lastMessage: "You are you! When do you plan on moving...", unread: 3, online: true },
-    { id: 2, name: "Alex Johnson", lastMessage: "Hey, how are you doing?", unread: 0, online: false },
-    { id: 3, name: "Sarah Williams", lastMessage: "Let's meet tomorrow", unread: 1, online: true },
-    { id: 4, name: "Michael Brown", lastMessage: "Thanks for the info!", unread: 0, online: false },
-    { id: 5, name: "Emily Davis", lastMessage: "Did you see the news?", unread: 2, online: true },
-    { id: 6, name: "David Miller", lastMessage: "Call me when you're free", unread: 0, online: false },
+  const { data: usersResponse, isLoading: isLoadingUsers } = useGetUsersQuery({});
+  const users = usersResponse?.data || [];
+  
+  // Add the create conversation mutation
+  const [createConversation, { isLoading: isCreatingConversation }] = useCreateConversationMutation();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+  // Mock users data - replace with actual user search API call
+  const mockUsers = [
+    { id: '1', name: 'John Doe', email: 'john@example.com', avatar: '' },
+    { id: '2', name: 'Jane Smith', email: 'jane@example.com', avatar: '' },
+    { id: '3', name: 'Bob Johnson', email: 'bob@example.com', avatar: '' },
   ];
 
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSendMessage = async () => {
+    if (message.trim() && activeChat) {
+      try {
+        await sendMessage({ conversationId: activeChat, content: message });
+        setMessage("");
+      } catch (error) {
+        console.error("Failed to send message:", error);
+      }
+    }
+  };
+
+
+  const handleCreateConversation = async () => {
+    if (selectedUser) {
+      try {
+        const result = await createConversation(selectedUser).unwrap();
+        setActiveChat(result.id); // Switch to the new conversation
+        setShowNewChatDialog(false);
+        setSearchQuery("");
+        setSelectedUser(null);
+      } catch (error) {
+        console.error("Failed to create conversation:", error);
+      }
+    }
+  };
   return (
     <div className="max-h-screen m-5 bg-gray-50">
       <div className="border rounded-lg bg-white shadow-sm">
-        <div className="p-3 border-b flex justify-between items-center bg-purple-50 cursor-move">
+        {/* Header */}
+        <div className="p-3 border-b flex justify-between items-center bg-purple-50">
           <div className="flex items-center space-x-2">
             <h2 className="font-bold text-lg text-purple-900">Messages</h2>
           </div>
+          <Button 
+            onClick={() => setShowNewChatDialog(true)}
+            className="bg-purple-600 hover:bg-purple-700 text-white"
+            size="sm"
+          >
+            <Plus size={16} className="mr-1" /> New Chat
+          </Button>
         </div>
 
+        {/* New Chat Dialog */}
+        {showNewChatDialog && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium">New Conversation</h3>
+                <button 
+                  onClick={() => {
+                    setShowNewChatDialog(false);
+                    setSearchQuery("");
+                    setSelectedUser(null);
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              
+              <div className="mb-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Search users by name or email..."
+                    className="pl-9 rounded-full"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+              
+              <div className="max-h-64 overflow-y-auto mb-4 border rounded-lg">
+                {isLoadingUsers ? (
+                  <div className="p-4 text-center">Loading users...</div>
+                ) : filteredUsers.length > 0 ? (
+                  filteredUsers.map(user => (
+                    <div
+                      key={user._id}
+                      className={`p-3 hover:bg-gray-50 cursor-pointer flex items-center space-x-3 ${
+                        selectedUser === user._id ? 'bg-purple-50' : ''
+                      }`}
+                      onClick={() => setSelectedUser(user._id)}
+                    >
+                      <Avatar className="h-10 w-10">
+                        <AvatarFallback>
+                          {user.name.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium truncate">{user.name}</h4>
+                        <p className="text-sm text-gray-500 truncate">{user.email}</p>
+                        {user.isOnline && (
+                          <div className="flex items-center mt-1">
+                            <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                            <span className="text-xs text-gray-500">Online</span>
+                          </div>
+                        )}
+                      </div>
+                      {selectedUser === user._id && (
+                        <Check className="h-5 w-5 text-purple-600" />
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500 py-4">
+                    {debouncedSearch ? "No users found" : "Start typing to search users"}
+                  </p>
+                )}
+              </div>
+              
+              <div className="flex justify-end space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowNewChatDialog(false);
+                    setSearchQuery("");
+                    setSelectedUser(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleCreateConversation}
+                  disabled={!selectedUser || isCreatingConversation}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  {isCreatingConversation ? "Creating..." : "Start Chat"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-1 overflow-hidden h-[calc(100vh-150px)]">
-          {/* Sidebar - Only this part scrolls */}
+          {/* Sidebar */}
           {sidebarOpen && (
             <div className="w-64 border-r flex flex-col">
               <div className="p-3 border-b">
@@ -48,47 +209,51 @@ export default function Home() {
                   />
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto"> {/* Added overflow-y-auto here */}
-                <div className="divide-y">
-                  {chats.map((chat) => (
-                    <div 
-                      key={chat.id}
-                      className={`p-3 hover:bg-gray-50 cursor-pointer ${activeChat === chat.id ? 'bg-purple-50' : ''}`}
-                      onClick={() => setActiveChat(chat.id)}
-                    >
-                      <div className="flex items-start space-x-3">
-                        <Avatar className="h-10 w-10 flex-shrink-0">
-                          <AvatarImage src="/placeholder.svg?height=40&width=40" />
-                          <AvatarFallback>
-                            {chat.name.split(' ').map(n => n[0]).join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex justify-between items-center">
-                            <h4 className="font-medium truncate">{chat.name}</h4>
-                            {chat.unread > 0 && (
-                              <span className="text-purple-600 bg-purple-100 rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                                {chat.unread}
-                              </span>
+              <div className="flex-1 overflow-y-auto">
+                {isLoadingConversations ? (
+                  <div className="p-4 text-center">Loading conversations...</div>
+                ) : (
+                  <div className="divide-y">
+                    {conversations.map((conversation) => (
+                      <div 
+                        key={conversation.id}
+                        className={`p-3 hover:bg-gray-50 cursor-pointer ${activeChat === conversation.id ? 'bg-purple-50' : ''}`}
+                        onClick={() => setActiveChat(conversation.id)}
+                      >
+                        <div className="flex items-start space-x-3">
+                          <Avatar className="h-10 w-10 flex-shrink-0">
+                            <AvatarImage src={conversation.avatar || "/placeholder.svg?height=40&width=40"} />
+                            <AvatarFallback>
+                              {conversation.name.split(' ').map(n => n[0]).join('')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-center">
+                              <h4 className="font-medium truncate">{conversation.name}</h4>
+                              {conversation.unreadCount > 0 && (
+                                <span className="text-purple-600 bg-purple-100 rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                                  {conversation.unreadCount}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600 truncate">{conversation.lastMessage?.content || "No messages yet"}</p>
+                            {conversation.isOnline && (
+                              <div className="flex items-center mt-1">
+                                <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                                <span className="text-xs text-gray-500">Online</span>
+                              </div>
                             )}
                           </div>
-                          <p className="text-sm text-gray-600 truncate">{chat.lastMessage}</p>
-                          {chat.online && (
-                            <div className="flex items-center mt-1">
-                              <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
-                              <span className="text-xs text-gray-500">Online</span>
-                            </div>
-                          )}
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
 
-          {/* Main Chat Area - Fixed height */}
+          {/* Main Chat Area */}
           <div className={`flex-1 flex flex-col ${!sidebarOpen ? 'w-full' : ''}`}>
             {activeChat ? (
               <>
@@ -105,11 +270,13 @@ export default function Home() {
                     <Avatar className="h-10 w-10">
                       <AvatarImage src="/placeholder.svg?height=40&width=40" />
                       <AvatarFallback>
-                        {chats.find(c => c.id === activeChat)?.name.split(' ').map(n => n[0]).join('')}
+                        {conversations.find(c => c.id === activeChat)?.name.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h4 className="font-medium">{chats.find(c => c.id === activeChat)?.name}</h4>
+                      <h4 className="font-medium">
+                        {conversations.find(c => c.id === activeChat)?.name}
+                      </h4>
                       <p className="text-xs text-green-500">Online</p>
                     </div>
                   </div>
@@ -124,37 +291,39 @@ export default function Home() {
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-                  <div className="bg-white p-3 rounded-lg shadow-sm max-w-[80%]">
-                    <p className="text-sm">
-                      Digital Technology is vulnerable in my country because there are alot of things one can not control
-                      outside the country, its messed up, what i am writing is messeup too. never mind
-                    </p>
-                    <div className="text-xs text-right text-gray-500 mt-1 flex items-center justify-end">
-                      9:00 PM <Check size={12} className="ml-1 text-purple-600" />
-                    </div>
-                  </div>
-
-                  <div className="bg-orange-50 p-3 rounded-lg shadow-sm max-w-[80%] ml-auto">
-                    <p className="text-sm">I understand. That sounds frustrating. Maybe we can find a solution together?</p>
-                    <div className="text-xs text-right text-gray-500 mt-1 flex items-center justify-end">
-                      9:02 PM <Check size={12} className="ml-1 text-purple-600" />
-                    </div>
-                  </div>
-
-                  <div className="bg-white p-3 rounded-lg shadow-sm max-w-[80%]">
-                    <p className="text-sm">
-                      Thanks for understanding. It's just been really challenging lately.
-                    </p>
-                    <div className="text-xs text-right text-gray-500 mt-1 flex items-center justify-end">
-                      9:05 PM <Check size={12} className="ml-1 text-purple-600" />
-                    </div>
-                  </div>
+                  {isLoadingMessages ? (
+                    <div className="text-center p-4">Loading messages...</div>
+                  ) : (
+                    messages.map((msg) => (
+                      <div 
+                        key={msg.id}
+                        className={`p-3 rounded-lg shadow-sm max-w-[80%] ${
+                          msg.isCurrentUser ? 'bg-orange-50 ml-auto' : 'bg-white'
+                        }`}
+                      >
+                        <p className="text-sm">{msg.content}</p>
+                        <div className="text-xs text-right text-gray-500 mt-1 flex items-center justify-end">
+                          {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {msg.isCurrentUser && <Check size={12} className="ml-1 text-purple-600" />}
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
 
                 <div className="p-4 border-t">
                   <div className="relative">
-                    <Input placeholder="Type your message here..." className="pr-12 rounded-full" />
-                    <Button className="absolute right-1 top-1/2 -translate-y-1/2 p-2 h-8 w-8 rounded-full bg-orange-500 hover:bg-orange-600">
+                    <Input 
+                      placeholder="Type your message here..." 
+                      className="pr-12 rounded-full" 
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                    />
+                    <Button 
+                      className="absolute right-1 top-1/2 -translate-y-1/2 p-2 h-8 w-8 rounded-full bg-orange-500 hover:bg-orange-600"
+                      onClick={handleSendMessage}
+                    >
                       <Send size={16} className="text-white" />
                     </Button>
                   </div>

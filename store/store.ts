@@ -1,17 +1,20 @@
 import { configureStore } from '@reduxjs/toolkit';
-// import { ItemsApi } from './items';
+import { ProfileApi } from './profile';
+import { ChatApi } from './chat';
 import authReducer from './authSlice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    // [ItemsApi.reducerPath]: ItemsApi.reducer,
+    [ChatApi.reducerPath]: ChatApi.reducer,
+    [ProfileApi.reducerPath]: ProfileApi.reducer,
   },
   devTools: process.env.NODE_ENV !== 'production',
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([
       
-      // ItemsApi.middleware,
+      ChatApi.middleware,
+      ProfileApi.middleware,
      
       // Add your custom authMiddleware here
      
