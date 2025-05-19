@@ -25,7 +25,7 @@ export default function HobbiesInfo({ onNext, onBack, initialData }: HobbiesInfo
   useEffect(() => {
     if (initialData) {
       form.setValues({
-        hobbies: initialData.hobbies || [],
+        hobbies: initialData || [],
       });
     }
   }, [initialData]);
