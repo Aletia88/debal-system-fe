@@ -7,7 +7,13 @@ const nextConfig = {
           hostname: 'assets.aceternity.com',
           pathname: '/**',
         },
+        {
+          protocol: 'https',
+          hostname: 'debal-api.onrender.com',
+          pathname: '/**',
+        },
       ],
+      
     },
   };
   
