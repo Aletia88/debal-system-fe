@@ -4,12 +4,12 @@ import { Bell, Search, ChevronDown, Minimize2, X, Eye, Heart, MessageCircle, Sen
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-// import Draggable from "react-draggable";
-
-// import { useGetConversationsQuery, useGetConversationMessagesQuery, useSendMessageMutation } from 
-import { useEffect, useState } from "react";
-import { useGetConversationsQuery, useGetConversationMessagesQuery, useSendMessageMutation, useCreateConversationMutation, useGetUsersQuery } from "@/store/chat";
-// ... other imports
+import { useEffect, useRef, useState } from "react";
+import { useGetConversationsQuery, useGetConversationMessagesQuery, useSendMessageMutation, useCreateConversationMutation, useGetUsersQuery, useMarkMessagesAsReadMutation } from "@/store/chat";
+import { useGetProfileQuery } from "@/store/profile";
+import { Flex } from "@mantine/core";
+import { IconArrowLeft } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [chatOpen, setChatOpen] = useState(true);
@@ -17,73 +17,84 @@ export default function Home() {
   const [activeChat, setActiveChat] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [message, setMessage] = useState("");
+  const messagesEndRef = useRef(null);
 
-  // Fetch conversations
-  const { data: conversations, isLoading: isLoadingConversations } = useGetConversationsQuery({});
-
-  // Fetch messages for active conversation
-  const { data: messages = [], isLoading: isLoadingMessages } = useGetConversationMessagesQuery(activeChat || "", {
+  const [markMessagesAsRead] = useMarkMessagesAsReadMutation();
+  const { data: conversations, isLoading: isLoadingConversations, refetch: refetchConversation } = useGetConversationsQuery({});
+  const { data: user } = useGetProfileQuery({});
+  const currentUserId = user?.user._id;
+  const { data: messages = [], isLoading: isLoadingMessages, refetch: refetchMessages } = useGetConversationMessagesQuery(activeChat || "", {
     skip: !activeChat
   });
-
-  // Send message mutation
   const [sendMessage] = useSendMessageMutation();
-
-  const toggleChat = () => setChatOpen(!chatOpen);
-  const toggleMinimize = () => setMinimized(!minimized);
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const router = useRouter();
   const [showNewChatDialog, setShowNewChatDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [debouncedSearch, setDebouncedSearch] = useState("");
-
   const { data: usersResponse, isLoading: isLoadingUsers } = useGetUsersQuery({});
   const users = usersResponse?.data || [];
-  
-  // Add the create conversation mutation
   const [createConversation, { isLoading: isCreatingConversation }] = useCreateConversationMutation();
+
+  const markMessagesRead = async (messageIds: string[]) => {
+    try {
+      await markMessagesAsRead({ messageIds });
+    } catch (error) {
+      console.error("Failed to mark messages as read:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (activeChat && messages.length > 0) {
+      const unreadMessages = messages.filter(
+        msg => !msg.read && msg.sender._id !== currentUserId
+      );
+      if (unreadMessages.length > 0) {
+        const unreadMessageIds = unreadMessages.map(msg => msg._id);
+        markMessagesRead(unreadMessageIds);
+      }
+    }
+  }, [activeChat, messages]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery);
     }, 300);
-
     return () => clearTimeout(timer);
   }, [searchQuery]);
-  // Mock users data - replace with actual user search API call
-  const mockUsers = [
-    { id: '1', name: 'John Doe', email: 'john@example.com', avatar: '' },
-    { id: '2', name: 'Jane Smith', email: 'jane@example.com', avatar: '' },
-    { id: '3', name: 'Bob Johnson', email: 'bob@example.com', avatar: '' },
-  ];
 
   const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  useEffect(() => { refetchConversation(); }, [activeChat, message]);
+  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+
   const handleSendMessage = async () => {
     if (message.trim() && activeChat) {
       try {
-        await sendMessage({ conversationId: activeChat, content: { 
-          content: message,
-          messageType: "text", // Explicitly set message type
-          conversationId: activeChat 
-        } });
+        await sendMessage({
+          conversationId: activeChat, content: {
+            content: message,
+            messageType: "text",
+            conversationId: activeChat
+          }
+        });
         setMessage("");
+        refetchConversation();
+        refetchMessages();
       } catch (error) {
         console.error("Failed to send message:", error);
       }
     }
   };
 
-
   const handleCreateConversation = async () => {
     if (selectedUser) {
       try {
         const result = await createConversation(selectedUser).unwrap();
-        console.log(result)
-        setActiveChat(result.data._id); // Switch to the new conversation
+        setActiveChat(result.data._id);
         setShowNewChatDialog(false);
         setSearchQuery("");
         setSelectedUser(null);
@@ -92,15 +103,17 @@ export default function Home() {
       }
     }
   };
+
   return (
-    <div className="max-h-screen m-5 bg-gray-50">
-      <div className="border rounded-lg bg-white shadow-sm">
+    <div className="h-screen flex flex-col">
+      <div className="flex-1 flex flex-col border rounded-lg bg-white shadow-sm overflow-hidden">
         {/* Header */}
         <div className="p-3 border-b flex justify-between items-center bg-purple-50">
           <div className="flex items-center space-x-2">
+            <IconArrowLeft onClick={() => router.push('/')} className='cursor-pointer' size={16} />
             <h2 className="font-bold text-lg text-purple-900">Messages</h2>
           </div>
-          <Button 
+          <Button
             onClick={() => setShowNewChatDialog(true)}
             className="bg-purple-600 hover:bg-purple-700 text-white"
             size="sm"
@@ -115,7 +128,7 @@ export default function Home() {
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-medium">New Conversation</h3>
-                <button 
+                <button
                   onClick={() => {
                     setShowNewChatDialog(false);
                     setSearchQuery("");
@@ -126,7 +139,7 @@ export default function Home() {
                   <X size={20} />
                 </button>
               </div>
-              
+
               <div className="mb-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -138,7 +151,7 @@ export default function Home() {
                   />
                 </div>
               </div>
-              
+
               <div className="max-h-64 overflow-y-auto mb-4 border rounded-lg">
                 {isLoadingUsers ? (
                   <div className="p-4 text-center">Loading users...</div>
@@ -146,9 +159,7 @@ export default function Home() {
                   filteredUsers.map(user => (
                     <div
                       key={user._id}
-                      className={`p-3 hover:bg-gray-50 cursor-pointer flex items-center space-x-3 ${
-                        selectedUser === user._id ? 'bg-purple-50' : ''
-                      }`}
+                      className={`p-3 hover:bg-gray-50 cursor-pointer flex items-center space-x-3 ${selectedUser === user._id ? 'bg-purple-50' : ''}`}
                       onClick={() => setSelectedUser(user._id)}
                     >
                       <Avatar className="h-10 w-10">
@@ -177,7 +188,7 @@ export default function Home() {
                   </p>
                 )}
               </div>
-              
+
               <div className="flex justify-end space-x-2">
                 <Button
                   variant="outline"
@@ -201,16 +212,16 @@ export default function Home() {
           </div>
         )}
 
-        <div className="flex flex-1 overflow-hidden h-[calc(100vh-150px)]">
+        <div className="flex flex-1 overflow-hidden">
           {/* Sidebar */}
           {sidebarOpen && (
-            <div className="w-64 border-r flex flex-col">
+            <div className="w-64 border-r flex flex-col h-full">
               <div className="p-3 border-b">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input 
-                    placeholder="Search chats..." 
-                    className="pl-9 rounded-full bg-gray-100 border-none" 
+                  <Input
+                    placeholder="Search chats..."
+                    className="pl-9 rounded-full bg-gray-100 border-none"
                   />
                 </div>
               </div>
@@ -220,7 +231,7 @@ export default function Home() {
                 ) : (
                   <div className="divide-y">
                     {conversations?.data.map((conversation) => (
-                      <div 
+                      <div
                         key={conversation.id}
                         className={`p-3 hover:bg-gray-50 cursor-pointer ${activeChat === conversation._id ? 'bg-purple-50' : ''}`}
                         onClick={() => setActiveChat(conversation._id)}
@@ -259,13 +270,13 @@ export default function Home() {
           )}
 
           {/* Main Chat Area */}
-          <div className={`flex-1 flex flex-col ${!sidebarOpen ? 'w-full' : ''}`}>
+          <div className={`flex-1 flex flex-col ${!sidebarOpen ? 'w-full' : ''} h-full`}>
             {activeChat ? (
               <>
                 <div className="p-3 border-b flex justify-between items-center">
                   <div className="flex items-center space-x-2">
                     {!sidebarOpen && (
-                      <button 
+                      <button
                         className="text-gray-500 hover:text-gray-700 p-1 mr-1"
                         onClick={toggleSidebar}
                       >
@@ -301,31 +312,56 @@ export default function Home() {
                   ) : (
                     messages.map((msg) => (
                       <div 
-                        key={msg.id}
-                        className={`p-3 rounded-lg shadow-sm max-w-[80%] ${
-                          msg.isCurrentUser ? 'bg-orange-50 ml-auto' : 'bg-white'
-                        }`}
+                        key={msg._id}
+                        className={`flex ${msg.sender._id === currentUserId ? 'justify-end' : 'justify-start'}`}
                       >
-                        <p className="text-sm">{msg.content}</p>
-                        <div className="text-xs text-right text-gray-500 mt-1 flex items-center justify-end">
-                          {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          {msg.isCurrentUser && <Check size={12} className="ml-1 text-purple-600" />}
+                        <div
+                          className={`p-1 pb-2 pr-20 rounded-lg shadow-sm max-w-[80%] min-w-32 relative ${
+                            msg.sender._id === currentUserId 
+                              ? 'bg-blue-100 rounded-tr-none' 
+                              : 'bg-white rounded-tl-none'
+                          } ${!msg.isRead && msg.sender._id === currentUserId ? 'border border-blue-200' : ''}`}
+                        >
+                          <p className="text-sm  pr-2">{msg.content}</p>
+                          <div className={`text-xs mt-1 pl-2 flex items-center absolute bottom-1 right-2 ${
+                            msg.sender._id === currentUserId 
+                              ? 'text-right justify-end text-gray-500' 
+                              : 'text-left justify-start text-gray-400'
+                          }`}>
+                            {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {msg.sender._id === currentUserId && (
+                              <Flex wrap='nowrap' className="ml-1">
+                                <Check 
+                                  size={12} 
+                                  className={msg.isRead ? 'text-blue-500' : 'text-gray-400'} 
+                                />
+                                {msg.read && (
+                                  <Check 
+                                    size={12} 
+                                    className="-ml-1 text-blue-500" 
+                                    strokeWidth={3}
+                                  />
+                                )}
+                              </Flex>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))
                   )}
+                  <div ref={messagesEndRef} />
                 </div>
 
                 <div className="p-4 border-t">
                   <div className="relative">
-                    <Input 
-                      placeholder="Type your message here..." 
-                      className="pr-12 rounded-full" 
+                    <Input
+                      placeholder="Type your message here..."
+                      className="pr-12 rounded-full"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     />
-                    <Button 
+                    <Button
                       className="absolute right-1 top-1/2 -translate-y-1/2 p-2 h-8 w-8 rounded-full bg-orange-500 hover:bg-orange-600"
                       onClick={handleSendMessage}
                     >
