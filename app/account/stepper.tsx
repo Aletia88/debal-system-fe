@@ -50,18 +50,18 @@ export default function Form() {
       </Box>
 
       {/* Form content */}
-      <Box style={{ flex: 1 }} bg='white' p={10}>
+      <Box style={{ flex: 1 }} bg='white' p={20} className='border-t-4 border-t-violet-600 '>
         {active === 0 && (
           <PersonalInfo 
             onNext={() => handleStepChange(1)} 
-            initialData={profileData?.personal_info}
+            initialData={profileData?.personalInfo}
           />
         )}
         {active === 1 && (
           <NeighborhoodInfo 
             onNext={() => handleStepChange(2)} 
             onBack={() => handleStepChange(0)}
-            initialData={profileData?.neighborhood}
+            initialData={profileData?.neighborhoodPrefs}
           />
         )}
         {active === 2 && (
@@ -89,7 +89,7 @@ export default function Form() {
           <SharedLivingInfo 
             onNext={() => handleStepChange(6)} 
             onBack={() => handleStepChange(4)}
-            initialData={profileData?.shared_living}
+            initialData={profileData?.sharedLiving}
           />
         )}
         {active === 6 && (
