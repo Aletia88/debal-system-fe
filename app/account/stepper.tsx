@@ -1,47 +1,27 @@
 import { useState } from 'react';
-import { Stepper, Button, Group, Flex, Box, TextInput, Text } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { Stepper, Button, Group, Flex, Box, Text, LoadingOverlay } from '@mantine/core';
 import PersonalInfo from './components/personal-Info';
+import NeighborhoodInfo from './components/neighborhood-Info';
+import LifestyleInfo from './components/lifestyle-Info';
+import HobbiesInfo from './components/hobbies-Info';
+import FinancialInfo from './components/financial-Info';
+import SharedLivingInfo from './components/sharedLiving-Info';
+import PetsInfo from './components/pets-Info';
+import FoodInfo from './components/food-Info';
+import WorkInfo from './components/work-Info';
+import { useGetProfileQuery, useUpdateFinancialMutation, useUpdateFoodMutation, useUpdateHobbiesMutation, useUpdateLifestyleMutation, useUpdateNeighborhoodMutation, useUpdatePersonalInfoMutation, useUpdatePetsMutation, useUpdateSharedLivingMutation, useUpdateWorkMutation } from '@/store/profile';
+import PrivacyInfo from './components/privacy';
+import CompleteMessage from './components/complete';
+
 
 export default function Form() {
   const [active, setActive] = useState(0);
   const [highestStepVisited, setHighestStepVisited] = useState(active);
-
-  // Form for step 1
-  const accountForm = useForm({
-    initialValues: { email: '', password: '' },
-    validate: {
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
-      password: (value) => (value.length >= 6 ? null : 'Password too short'),
-    },
-  });
-
-  // Form for step 2
-  const verifyForm = useForm({
-    initialValues: { code: '' },
-    validate: {
-      code: (value) => (value.length === 6 ? null : 'Code must be 6 digits'),
-    },
-  });
-
-  // Form for step 3
-  const profileForm = useForm({
-    initialValues: { name: '', company: '' },
-    validate: {
-      name: (value) => (value.trim() ? null : 'Name is required'),
-    },
-  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: profileData, isLoading } = useGetProfileQuery({});
 
   const handleStepChange = (nextStep: number) => {
-    if (nextStep > 3 || nextStep < 0) return;
-    
-    // Validate current step before proceeding
-    // if (nextStep > active) {
-    //   if (active === 0 ) return;
-    //   if (active === 1 ) return;
-    //   if (active === 2) return;
-    // }
-
+    if (nextStep > 10 || nextStep < 0) return;
     setActive(nextStep);
     setHighestStepVisited((hSC) => Math.max(hSC, nextStep));
   };
@@ -49,89 +29,115 @@ export default function Form() {
   const shouldAllowSelectStep = (step: number) => highestStepVisited >= step && active !== step;
 
   return (
-    <Flex gap="xl" align="flex-start" className='p-5'>
-      {/* Vertical stepper on the left */}
+    <Flex gap="xl" align="flex-start" className='p-5' pos="relative">
+      <LoadingOverlay visible={isLoading || isSubmitting}  />
+      
+      {/* Vertical stepper */}
       <Box>
         <Stepper active={active} onStepClick={setActive} orientation="vertical" className='pr-5'>
-          <Stepper.Step
-            label="Step 1"
-            description="Personal Information"
-            allowStepSelect={shouldAllowSelectStep(0)}
-          />
-          <Stepper.Step
-            label="Step 2"
-            description="City/Neigboorhood"
-            allowStepSelect={shouldAllowSelectStep(1)}
-          />
-          <Stepper.Step
-            label="Step 3"
-            description="Lifestyle Information"
-            allowStepSelect={shouldAllowSelectStep(2)}
-          />
-          {/* <Stepper.Completed /> */}
+          <Stepper.Step label="Personal Info" allowStepSelect={shouldAllowSelectStep(0)} />
+          <Stepper.Step label="Neighborhood" allowStepSelect={shouldAllowSelectStep(1)} />
+          <Stepper.Step label="Lifestyle" allowStepSelect={shouldAllowSelectStep(2)} />
+          <Stepper.Step label="Hobbies" allowStepSelect={shouldAllowSelectStep(3)} />
+          <Stepper.Step label="Financial" allowStepSelect={shouldAllowSelectStep(4)} />
+          <Stepper.Step label="Shared Living" allowStepSelect={shouldAllowSelectStep(5)} />
+          <Stepper.Step label="Pets" allowStepSelect={shouldAllowSelectStep(6)} />
+          <Stepper.Step label="Food" allowStepSelect={shouldAllowSelectStep(7)} />
+          <Stepper.Step label="Work" allowStepSelect={shouldAllowSelectStep(8)} />
+          <Stepper.Step label="Privacy" allowStepSelect={shouldAllowSelectStep(9)} />
+          <Stepper.Step label="Complete" allowStepSelect={shouldAllowSelectStep(10)} />
         </Stepper>
       </Box>
 
-      {/* Form content on the right */}
-      <Box style={{ flex: 1 }} >
+      {/* Form content */}
+      <Box style={{ flex: 1 }} bg='white' p={10}>
         {active === 0 && (
-         <PersonalInfo />
+          <PersonalInfo 
+            onNext={() => handleStepChange(1)} 
+            initialData={profileData?.personal_info}
+          />
         )}
-
         {active === 1 && (
-          <form onSubmit={verifyForm.onSubmit(() => handleStepChange(2))}>
-            <Text size="xl" fw={500} mb="md">Verify Email</Text>
-            <TextInput
-              label="Verification Code"
-              placeholder="6-digit code"
-              {...verifyForm.getInputProps('code')}
-              mb="md"
-            />
-          </form>
+          <NeighborhoodInfo 
+            onNext={() => handleStepChange(2)} 
+            onBack={() => handleStepChange(0)}
+            initialData={profileData?.neighborhood}
+          />
         )}
-
         {active === 2 && (
-          <form onSubmit={profileForm.onSubmit(() => handleStepChange(3))}>
-            <Text size="xl" fw={500} mb="md">Complete Profile</Text>
-            <TextInput
-              label="Full Name"
-              placeholder="Your name"
-              {...profileForm.getInputProps('name')}
-              mb="sm"
-            />
-            <TextInput
-              label="Company (optional)"
-              placeholder="Where you work"
-              {...profileForm.getInputProps('company')}
-              mb="md"
-            />
-          </form>
+          <LifestyleInfo 
+            onNext={() => handleStepChange(3)} 
+            onBack={() => handleStepChange(1)}
+            initialData={profileData?.lifestyle}
+          />
         )}
-
         {active === 3 && (
-          <div>
-            <Text size="xl" fw={500} mb="md">Registration Complete!</Text>
-            <Text mb="md">Thank you for signing up.</Text>
-            <Text>Email: {accountForm.values.email}</Text>
-            <Text>Name: {profileForm.values.name}</Text>
-          </div>
+          <HobbiesInfo 
+            onNext={() => handleStepChange(4)} 
+            onBack={() => handleStepChange(2)}
+            initialData={profileData?.hobbies}
+          />
         )}
-
-        <Group justify="center" mt="sm">
-          {active > 0 && (
-            <Button variant="default" onClick={() => handleStepChange(active - 1)}>
-              Back
-            </Button>
-          )}
-          {active < 3 ? (
-             <div className="mt-2 flex justify-center">
-            <Button onClick={() => handleStepChange(active + 1)}>
-              {active === 2 ? 'Complete' : 'Save and Continue'}
-            </Button></div>
-          ) : (
-            <Button onClick={() => alert('Form submitted!')}>Submit</Button>
-          )}
-        </Group>
+        {active === 4 && (
+          <FinancialInfo 
+            onNext={() => handleStepChange(5)} 
+            onBack={() => handleStepChange(3)}
+            initialData={profileData?.financial}
+          />
+        )}
+        {active === 5 && (
+          <SharedLivingInfo 
+            onNext={() => handleStepChange(6)} 
+            onBack={() => handleStepChange(4)}
+            initialData={profileData?.shared_living}
+          />
+        )}
+        {active === 6 && (
+          <PetsInfo 
+            onNext={() => handleStepChange(7)} 
+            onBack={() => handleStepChange(5)}
+            initialData={profileData?.pets}
+          />
+        )}
+        {active === 7 && (
+          <FoodInfo 
+            onNext={() => handleStepChange(8)} 
+            onBack={() => handleStepChange(6)}
+            initialData={profileData?.food}
+          />
+        )}
+        {active === 8 && (
+          <WorkInfo 
+            // onSubmit={() => console.log('Profile complete!')}
+            // onBack={() => handleStepChange(7)}
+            // initialData={profileData?.work}
+            onNext={() => handleStepChange(9)} 
+            onBack={() => handleStepChange(7)}
+            initialData={profileData?.work}
+          />
+        )}
+        {active === 9 && (
+          <PrivacyInfo 
+            // onSubmit={() => console.log('Profile complete!')}
+            onNext={() => handleStepChange(10)}
+            onBack={() => handleStepChange(8)}
+            initialData={profileData?.privacy}
+            // onNext={() => handleStepChange(9)} 
+            // onBack={() => handleStepChange(7)}
+            // initialData={profileData?.work}
+          />
+        )}
+        {active === 10 && (
+          <CompleteMessage 
+            // onSubmit={() => console.log('Profile complete!')}
+            // onNext={() => handleStepChange(10)}
+            onBack={() => handleStepChange(9)}
+            // initialData={profileData?.privacy}
+            // onNext={() => handleStepChange(9)} 
+            // onBack={() => handleStepChange(7)}
+            // initialData={profileData?.work}
+          />
+        )}
       </Box>
     </Flex>
   );
