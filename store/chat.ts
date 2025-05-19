@@ -33,9 +33,7 @@ export const ChatApi = createApi({
     // Get conversation messages
     getConversationMessages: builder.query({
       query: (conversationId) => `/chat/${conversationId}`,
-      providesTags: (result, error, conversationId) => [
-        { type: "Message", id: conversationId }
-      ]
+      providesTags: ["Message"]
     }),
 
     // Send a message
@@ -45,9 +43,7 @@ export const ChatApi = createApi({
         method: "POST",
         body:  content 
       }),
-      invalidatesTags: (result, error, { conversationId }) => [
-        { type: "Message", id: conversationId }
-      ]
+      invalidatesTags: ["Message"]
     }),
 
     // Mark messages as read
@@ -55,7 +51,7 @@ export const ChatApi = createApi({
       query: (messageIds) => ({
         url: "/chat/messages/read",
         method: "POST",
-        body: { messageIds }
+        body:  messageIds 
       }),
       invalidatesTags: ["Message"]
     }),
@@ -63,7 +59,7 @@ export const ChatApi = createApi({
     // Get user conversations list
     getConversations: builder.query({
       query: () => "/chat/users/conversations",
-      providesTags: ["Conversation"]
+      providesTags: ["Message"]
     }),
     getUsers: builder.query({
       query: () => "/admin/allusers",
