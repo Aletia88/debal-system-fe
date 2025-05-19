@@ -14,13 +14,14 @@ export function Providers({ children }: {
   const pathname = usePathname();
   const isLoginPage = pathname === '/login';
   const isSignUpPage = pathname === '/signup';
+  const isChatPage = pathname === '/chat';
 
   return (
     <SessionProvider>
       <Provider store={store}>
         <ProtectedRoute>
           <Notifications />
-          {!isLoginPage && !isSignUpPage && <NavbarDemo />}
+          {!isLoginPage && !isSignUpPage && !isChatPage && <NavbarDemo />}
           <div>
             {children}
           </div>
