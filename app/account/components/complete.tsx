@@ -63,7 +63,7 @@ export default function CompleteMessage({ onBack }: CompleteMessageProps) {
             </>
           )}
           {isSuccess && (
-            <Button component="a" href="/">
+            <Button component="a" href="/profile">
               Go to Dashboard
             </Button>
           )}
