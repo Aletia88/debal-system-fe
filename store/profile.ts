@@ -145,6 +145,22 @@ export const ProfileApi = createApi({
               }),
             invalidatesTags: ["profiles"],
           }),
+          setProfilePhoto: builder.mutation<void, string>({
+            query: (filename) => ({
+              url: `/profiles/profile/photo/set-profile/${filename}`,
+              method: "PATCH",
+              
+            }),
+            invalidatesTags: ["profiles"],
+          }),
+          RemoveProfilePhoto: builder.mutation<void, string>({
+            query: (filename) => ({
+              url: `profiles/profile/photo/${filename}`,
+              method: "DELETE",
+              
+            }),
+            invalidatesTags: ["profiles"],
+          }),
 
     }),
 });
@@ -162,5 +178,7 @@ export const {
     useUpdateWorkMutation,
     useUpdatePrivacyMutation,
     useMarkCompleteMutation,
-    useUpdateProfilePhotoMutation
+    useUpdateProfilePhotoMutation,
+    useSetProfilePhotoMutation,
+    useRemoveProfilePhotoMutation
 } = ProfileApi;
