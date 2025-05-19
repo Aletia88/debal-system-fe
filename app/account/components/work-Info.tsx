@@ -1,6 +1,7 @@
 import { useUpdateWorkMutation } from '@/store/profile';
 import { Button, Group, Select, Switch } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useEffect } from 'react';
 
 // interface WorkInfoProps {
 //   onSubmit: () => void;
@@ -23,6 +24,16 @@ export default function WorkInfo({ onNext, onBack, initialData }: WorkInfoProps)
       work_hours: (value) => (value ? null : 'This field is required'),
     },
   });
+
+  useEffect(() => {
+      if (initialData) {
+        form.setValues({
+          work_hours: initialData.work_hours|| '',
+          works_from_home: initialData.works_from_home || '',
+          chronotype: initialData.chronotype || '',
+        });
+      }
+    }, [initialData]);
   const handleSubmit = async (values: any) => {
     try {
       await updateWork(values).unwrap();

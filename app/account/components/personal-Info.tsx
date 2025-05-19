@@ -62,7 +62,7 @@ export default function PersonalInfo({ onNext, initialData }: PersonalInfoProps)
       
       <Select
         label="Gender"
-        data={['Male', 'Female', 'Non-binary', 'Prefer not to say']}
+        data={['male', 'female']}
         {...form.getInputProps('gender')}
         mb="md"
       />
@@ -75,7 +75,7 @@ export default function PersonalInfo({ onNext, initialData }: PersonalInfoProps)
       
       <Select
         label="Religion"
-        data={['Christianity', 'Islam', 'Hinduism', 'Buddhism', 'Atheism', 'Other']}
+        data={['christianity', 'islam', 'hinduism', 'judaism', 'other', 'none']}
         {...form.getInputProps('religion')}
         mb="md"
       />
