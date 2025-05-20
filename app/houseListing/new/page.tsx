@@ -6,6 +6,7 @@ import { DatePicker } from '@mantine/dates';
 import { useRouter } from 'next/navigation';
 import { useCreateListingMutation } from '@/store/houseListing';
 import { useState } from 'react';
+import { notifications } from '@mantine/notifications';
 
 const amenitiesOptions = [
   'WiFi',
@@ -64,9 +65,7 @@ export default function CreateListingPage() {
   const handleSubmit = async (values: typeof form.values) => {
     try {
       // First upload images if any
-      const uploadedImageUrls = files.length > 0 
-        ? await uploadImages(files) 
-        : [];
+      
   
       // Prepare the payload
       const payload = {
@@ -96,8 +95,7 @@ export default function CreateListingPage() {
         },
         house_rules: "682b1ad47bf7700c34fedb43", // Add this field to your form if needed
 
-        photos: uploadedImageUrls,
-        images: uploadedImageUrls // Duplicate if needed or remove one
+       
       };
   
       // Send the JSON payload
@@ -115,7 +113,7 @@ export default function CreateListingPage() {
       }
   
       const result = await response.json();
-      router.push(`/listings/${result._id}`);
+      router.push(`/houseListing/${result._id}`);
     } catch (error) {
       console.error('Submission error:', error);
       notifications.show({
@@ -127,19 +125,7 @@ export default function CreateListingPage() {
   };
   
   // Helper function to upload images
-  async function uploadImages(files: File[]): Promise<string[]> {
-    const uploadedUrls: string[] = [];
-    
-    // Implement your actual image upload logic here
-    // This is just a mock implementation
-    for (const file of files) {
-      // In a real app, you would upload to S3, Cloudinary, etc.
-      // and get back a URL
-      uploadedUrls.push(`https://example.com/uploads/${file.name}`);
-    }
-    
-    return uploadedUrls;
-  }
+ 
 
   return (
     <Paper p="xl" shadow="sm" radius="md" maw={1200} mx="auto">
@@ -287,23 +273,7 @@ export default function CreateListingPage() {
             />
           </Paper>
 
-          {/* Images */}
-          <Paper p="md" withBorder>
-            <Title order={2} mb="md">Images</Title>
-            <FileInput
-              label="Upload Images"
-              multiple
-              accept="image/*"
-              value={files}
-              onChange={setFiles}
-              clearable
-            />
-            {files.length > 0 && (
-              <Text size="sm" mt="xs">
-                {files.length} {files.length === 1 ? 'file' : 'files'} selected
-              </Text>
-            )}
-          </Paper>
+       
 
           <Group justify="right" mt="md">
             <Button

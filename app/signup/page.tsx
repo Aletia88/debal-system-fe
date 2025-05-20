@@ -1,5 +1,5 @@
 'use client'
-import { Anchor, Button, Checkbox, Divider, Group, Image, Paper, PasswordInput, Stack, Text, TextInput, Title, rem, Notification } from "@mantine/core";
+import { Anchor, Button, Checkbox, Divider, Group, Image, Paper, PasswordInput, Stack, Text, TextInput, Title, rem, Notification, Select } from "@mantine/core";
 import Link from "next/link";
 import { IconBrandGithub, IconBrandGoogle, IconX } from "@tabler/icons-react";
 import { loginSuccess, loginFailure } from "@/store/authSlice";
@@ -20,6 +20,7 @@ export default function SignUpPage() {
       name: "",
       email: "",
       password: "",
+      role: 'user' 
     },
     validate: {
       name: (value) => (value.trim().length < 2 ? "Name must be at least 2 characters" : null),
@@ -48,6 +49,7 @@ export default function SignUpPage() {
           name: values.name,
           email: values.email,
           password: values.password,
+          role: values.role,
         }),
       });
 
@@ -171,7 +173,17 @@ export default function SignUpPage() {
                       {...form.getInputProps('password')}
                       required
                     />
-                    <Checkbox
+                    <Select
+                      label="Account Type"
+                      placeholder="Select your role"
+                      data={[
+                        { value: 'user', label: 'Regular User' },
+                        { value: 'houseprovider', label: 'House Provider' },
+                      ]}
+                      {...form.getInputProps('role')}
+                      required
+                    />
+                    {/* <Checkbox
                       label={
                         <Text size="sm">
                           I agree to the{" "}
@@ -185,7 +197,8 @@ export default function SignUpPage() {
                         </Text>
                       }
                       required
-                    />
+                    /> */}
+
                     <Button 
                       type="submit"
                       color="violet" 

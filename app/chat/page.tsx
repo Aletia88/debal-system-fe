@@ -38,7 +38,7 @@ export default function ChatPage() {
   }, [newChatUserId, conversations]);
 
   return (
-    <>
+    <div style={{ maxHeight: '100vh' }}>
       <ChatHeader 
         onNewChat={() => setShowNewChatDialog(true)}
         toggleSidebar={toggleSidebar}
@@ -72,6 +72,6 @@ export default function ChatPage() {
           }}
         />
       </div>
-    </>
+    </div>
   );
 }

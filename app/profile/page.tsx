@@ -159,9 +159,9 @@ export default function ProfilePage() {
       {/* Photo Upload Section */}
       <div className="container mx-auto px-4 mt-8">
         <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex md:justify-between flex-col md:flex-row items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-800">Photos</h3>
-            <div className="flex gap-2">
+            <div className="flex w-[95%] gap-2 px-2">
               <FileInput
                 value={files}
                 onChange={setFiles}
@@ -286,7 +286,7 @@ export default function ProfilePage() {
           </div>
         )}
         {/* Profile Content Sections */}
-        <SimpleGrid cols={2}>
+        <SimpleGrid cols={{ base: 1, sm: 2,  }}>
           <Stack><PersonalInfo /><NeighborhoodInfo /> <WorkInfo /> <HobbiesInfo /> <PetsInfo /></Stack>
           <Stack><LifestyleInfo /> <FoodInfo /> <FinancialInfo /> <SharedLivingInfo /></Stack>
         </SimpleGrid>

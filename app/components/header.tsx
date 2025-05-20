@@ -49,8 +49,8 @@ export function NavbarDemo() {
   };
 
   const navItems = [
-    { name: "Home", link: "#features" },
-    { name: "About Us", link: "#pricing" },
+    { name: "Home", link: "/" },
+    { name: "Chat", link: "/chat" },
     { name: "Find Room", link: "/houseListing" },
   ];
 

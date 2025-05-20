@@ -28,8 +28,8 @@ const ProfileDetail = () => {
         <div className="min-h-screen bg-gray-50 pb-16">
         {/* Profile Header */}
         <div className="bg-white py-6 px-4 text-center">
-          <h1 className="text-2xl font-bold text-purple-900">My Profile</h1>
-          <p className="text-gray-500 mt-1">Holla!, Fill in the details to complete sign up</p>
+          <h1 className="text-2xl font-bold text-purple-900 mb-2">Profile Info</h1>
+          {/* <p className="text-gray-500 mt-1">Holla!, Fill in the details to complete sign up</p> */}
         </div>
   
         {/* Profile Banner */}
@@ -87,8 +87,7 @@ const ProfileDetail = () => {
                 {/* </div> */}
                 </div>
                 </div>
-          </div>
-
+          
           {isViewerOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
             <div className="relative max-w-[90vw] max-h-[90vh]">
@@ -136,6 +135,8 @@ const ProfileDetail = () => {
           <Stack><LifestyleInfo /> <FoodInfo /> <FinancialInfo /> <SharedLivingInfo /></Stack>
         </SimpleGrid>
         </div>
+        </div>
+
     )
 }
 

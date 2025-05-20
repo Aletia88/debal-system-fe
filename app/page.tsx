@@ -8,6 +8,7 @@ import { ChatWindow } from '@/components/Chat/ChatWindow';
 import { useChat } from '@/hooks/useChat';
 import { Chat } from '@/types/chat';
 import FilterSidebar from '@/components/filter-sidebar';
+import { useGetProfileByRecommendationQuery } from '@/store/profile';
 
 const matches = [
   { id: 1, name: "Rebecca Oyebanji", matchPercentage: 80, image: "/image.png" },
@@ -31,6 +32,7 @@ export default function MatchesPage() {
   const [activeChat, setActiveChat] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showFilter, setShowFilter] = useState(false); // Changed to false by default
+  const {data:recommendation} = useGetProfileByRecommendationQuery({})
 
   const handleMessageClick = (userId: number) => {
     setActiveChat(userId);
@@ -42,7 +44,8 @@ export default function MatchesPage() {
   const toggleChat = () => setChatOpen(!chatOpen);
   const toggleMinimize = () => setMinimized(!minimized);
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-  const toggleFilter = () => setShowFilter(!showFilter); // Added toggle function
+  const toggleFilter = () => setShowFilter(!showFilter);
+   // Added toggle function
 
   return (
     <div className="min-h-screen bg-gray-50 flex">

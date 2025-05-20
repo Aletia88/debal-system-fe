@@ -8,7 +8,7 @@ import { Button, Dialog, Group, Modal, FileButton, ActionIcon, Text } from '@man
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useGetProfileQuery } from '@/store/profile';
-import { IconTrash, IconUpload } from '@tabler/icons-react';
+import { IconEdit, IconTrash, IconUpload } from '@tabler/icons-react';
 import ProviderInfo from './PersonalInfo';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
@@ -164,27 +164,42 @@ export default function ListingDetailPage() {
       </Modal>
 
       {/* Header with back button and action buttons */}
-      <div className="mb-4 flex justify-between items-center">
-        <Link href="/houseListing" className="text-blue-600 hover:underline">
-          ← Back to listings
-        </Link>
-        
-        {isMyListing && (
-          <Group>
-            <Button 
-              onClick={openUploadModal}
-              leftSection={<IconUpload size="1rem" />}
-              variant="outline"
-            >
-              Add Images
-            </Button>
-            <Link href={`/houseListing/edit/${id}`}>
-              <Button variant="outline">Edit Listing</Button>
-            </Link>
-            <Button color="red" onClick={openDeleteModal}>Delete Listing</Button>
-          </Group>
-        )}
-      </div>
+      <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+  <Link href="/houseListing" className="text-blue-600 hover:underline w-full sm:w-auto">
+    ← Back to listings
+  </Link>
+  
+  {isMyListing && (
+    // <div className="flex flex-col gap-2 sm:flex-row sm:gap-4 w-full sm:w-auto">
+    <Group justify='end' wrap='nowrap'>
+      <Button 
+        onClick={openUploadModal}
+        leftSection={<IconUpload  size="1rem" />}
+        variant="outline"
+        className="w-full sm:w-auto"
+      >
+        <span className="sr-only sm:not-sr-only">Add Images</span>
+        {/* <IconUpload className="sm:hidden" size="1rem" /> */}
+      </Button>
+      
+      {/* <Link href={`/houseListing/edit/${id}`} className="w-full "> */}
+        <Button onClick={() => router.push(`/houseListing/edit/${id}`)} variant="outline" className="w-full sm:w-auto">
+          <span className="sr-only sm:not-sr-only">Edit Listing</span>
+          <IconEdit className="sm:hidden" size="1rem" />
+        </Button>
+      {/* </Link> */}
+      
+      <Button 
+        color="red" 
+        onClick={openDeleteModal}
+        className="w-full sm:w-auto"
+      >
+        <span className="sr-only sm:not-sr-only">Delete Listing</span>
+        <IconTrash className="sm:hidden" size="1rem" />
+      </Button>
+    </Group>
+  )}
+</div>
 
       {/* Main content */}
       <div className="flex flex-col md:flex-row gap-8">
