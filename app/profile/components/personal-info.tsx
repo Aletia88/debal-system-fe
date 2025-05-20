@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Check, Pencil } from 'lucide-react';
 import { useGetProfileQuery, useUpdatePersonalInfoMutation } from "@/store/profile";
-import { Modal, Button, TextInput, Select, Radio } from '@mantine/core';
+import { Modal, Button, TextInput, Select, Radio, Textarea, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
 const PersonalInfo = () => {
@@ -12,15 +12,27 @@ const PersonalInfo = () => {
 
     const form = useForm({
         initialValues: {
-            age: profile?.personalInfo?.age?.toString() || '',
-            gender: profile?.personalInfo?.gender || '',
-            occupation: profile?.personalInfo?.occupation || '',
-            religion: profile?.personalInfo?.religion || '',
-            relationship_status: profile?.personalInfo?.relationship_status || 'single',
+            fullname: '',
+            age: '',
+            gender: '',
+            occupation: '',
+            religion: '',
+            relationship_status: 'single',
+            bio: '',
+            phone_number: '',
+            social_media_links: {
+                facebook: '',
+                instagram: '',
+                twitter: '',
+                linkedin: '',
+                telegram: ''
+            }
         },
         validate: {
+            fullname: (value) => (value.trim().length > 0 ? null : 'Full name is required'),
             age: (value) => (value && !isNaN(Number(value)) ? null : 'Please enter a valid age'),
             gender: (value) => (value ? null : 'This field is required'),
+            phone_number: (value) => (value.trim().length > 0 ? null : 'Phone number is required'),
         },
     });
 
@@ -28,23 +40,43 @@ const PersonalInfo = () => {
     useEffect(() => {
         if (profile?.personalInfo) {
             form.setValues({
+                fullname: profile.user.name || '',
                 age: profile.personalInfo.age?.toString() || '',
                 gender: profile.personalInfo.gender || '',
                 occupation: profile.personalInfo.occupation || '',
                 religion: profile.personalInfo.religion || '',
                 relationship_status: profile.personalInfo.relationship_status || 'single',
+                bio: profile.personalInfo.bio || '',
+                phone_number: profile.personalInfo.phone_number || '',
+                social_media_links: {
+                    facebook: profile.personalInfo.social_media_links?.facebook || '',
+                    instagram: profile.personalInfo.social_media_links?.instagram || '',
+                    twitter: profile.personalInfo.social_media_links?.twitter || '',
+                    linkedin: profile.personalInfo.social_media_links?.linkedin || '',
+                    telegram: profile.personalInfo.social_media_links?.telegram || ''
+                }
             });
         }
     }, [profile]);
 
-    const handleSubmit = async (values:any) => {
+    const handleSubmit = async (values: any) => {
         try {
             await updatePersonalInfo({
+                fullname: values.name,
                 age: Number(values.age),
-                gender: values.gender,
+                gender: values.gender.toLowerCase(),
                 occupation: values.occupation,
-                religion: values.religion,
+                religion: values.religion.toLowerCase(),
                 relationship_status: values.relationship_status,
+                bio: values.bio,
+                phone_number: values.phone_number,
+                social_media_links: {
+                    facebook: values.social_media_links.facebook,
+                    instagram: values.social_media_links.instagram,
+                    twitter: values.social_media_links.twitter,
+                    linkedin: values.social_media_links.linkedin,
+                    telegram: values.social_media_links.telegram
+                }
             }).unwrap();
             setModalOpened(false);
         } catch (error) {
@@ -75,12 +107,23 @@ const PersonalInfo = () => {
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
+                            <h4 className="font-medium">{profile?.user?.name || 'Not specified'}</h4>
+                            <p className="text-sm text-gray-500">Full Name</p>
+                        </div>
+                        <div>
                             <h4 className="font-medium">{profile?.personalInfo?.age || 'Not specified'}</h4>
                             <p className="text-sm text-gray-500">Age</p>
                         </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
                         <div>
                             <h4 className="font-medium capitalize">{profile?.personalInfo?.gender || 'Not specified'}</h4>
                             <p className="text-sm text-gray-500">Gender</p>
+                        </div>
+                        <div>
+                            <h4 className="font-medium">{profile?.personalInfo?.phone_number || 'Not specified'}</h4>
+                            <p className="text-sm text-gray-500">Phone Number</p>
                         </div>
                     </div>
 
@@ -99,6 +142,40 @@ const PersonalInfo = () => {
                         <h4 className="font-medium">{profile?.personalInfo?.occupation || 'Not specified'}</h4>
                         <p className="text-sm text-gray-500">Occupation</p>
                     </div>
+
+                    {profile?.personalInfo?.bio && (
+                        <div>
+                            <h4 className="font-medium">{profile.personalInfo.bio}</h4>
+                            <p className="text-sm text-gray-500">Bio</p>
+                        </div>
+                    )}
+
+                    {(profile?.personalInfo?.social_media_links?.facebook || 
+                      profile?.personalInfo?.social_media_links?.instagram ||
+                      profile?.personalInfo?.social_media_links?.twitter ||
+                      profile?.personalInfo?.social_media_links?.linkedin ||
+                      profile?.personalInfo?.social_media_links?.telegram) && (
+                        <div>
+                            <h4 className="font-medium text-gray-500 text-sm mb-1">Social Media</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {profile.personalInfo.social_media_links?.facebook && (
+                                    <span className="text-sm bg-blue-50 text-blue-600 px-2 py-1 rounded">Facebook</span>
+                                )}
+                                {profile.personalInfo.social_media_links?.instagram && (
+                                    <span className="text-sm bg-pink-50 text-pink-600 px-2 py-1 rounded">Instagram</span>
+                                )}
+                                {profile.personalInfo.social_media_links?.twitter && (
+                                    <span className="text-sm bg-sky-50 text-sky-600 px-2 py-1 rounded">Twitter</span>
+                                )}
+                                {profile.personalInfo.social_media_links?.linkedin && (
+                                    <span className="text-sm bg-blue-50 text-blue-700 px-2 py-1 rounded">LinkedIn</span>
+                                )}
+                                {profile.personalInfo.social_media_links?.telegram && (
+                                    <span className="text-sm bg-teal-50 text-teal-600 px-2 py-1 rounded">Telegram</span>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -107,49 +184,113 @@ const PersonalInfo = () => {
                 opened={modalOpened}
                 onClose={() => setModalOpened(false)}
                 title="Edit Personal Information"
-                size="md"
+                size="lg"
+                overlayProps={{
+                    backgroundOpacity: 0.55,
+                    blur: 3,
+                }}
             >
                 <form onSubmit={form.onSubmit(handleSubmit)}>
                     <TextInput
-                        label="Age"
-                        type="number"
-                        {...form.getInputProps('age')}
+                        label="Full Name"
+                        placeholder="Your full name"
+                        {...form.getInputProps('fullname')}
                         mb="md"
+                        required
                     />
-                    
-                    <Select
-                        label="Gender"
-                        data={['male', 'female']}
-                        {...form.getInputProps('gender')}
+
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                        <TextInput
+                            label="Age"
+                            type="number"
+                            placeholder="Your age"
+                            {...form.getInputProps('age')}
+                            required
+                        />
+                        
+                        <Select
+                            label="Gender"
+                            placeholder="Select gender"
+                            data={['male', 'female']}
+                            {...form.getInputProps('gender')}
+                            required
+                        />
+                    </div>
+
+                    <TextInput
+                        label="Phone Number"
+                        placeholder="Your phone number"
+                        {...form.getInputProps('phone_number')}
                         mb="md"
+                        required
                     />
-                    
+
                     <TextInput
                         label="Occupation"
+                        placeholder="Your occupation"
                         {...form.getInputProps('occupation')}
                         mb="md"
                     />
-                    
-                    <Select
-                        label="Religion"
-                        data={['christianity', 'islam', 'hinduism', 'judaism', 'other', 'none']}
-                        {...form.getInputProps('religion')}
+
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                        <Select
+                            label="Religion"
+                            placeholder="Select religion"
+                            data={['christianity', 'islam', 'hinduism', 'judaism', 'other', 'none']}
+                            {...form.getInputProps('religion')}
+                        />
+                        
+                        <Radio.Group
+                            label="Relationship Status"
+                            {...form.getInputProps('relationship_status')}
+                        >
+                            <Group mt="xs">
+                                <Radio value="single" label="Single" />
+                                <Radio value="in_relationship" label="In a relationship" />
+                                <Radio value="married" label="Married" />
+                            </Group>
+                        </Radio.Group>
+                    </div>
+
+                    <Textarea
+                        label="Bio"
+                        placeholder="Tell us about yourself"
+                        {...form.getInputProps('bio')}
                         mb="md"
+                        autosize
+                        minRows={3}
                     />
+
+                    <div className="space-y-3 mb-6">
+                        <h4 className="font-medium text-sm">Social Media Links</h4>
+                        <TextInput
+                            label="Facebook"
+                            placeholder="https://facebook.com/username"
+                            {...form.getInputProps('social_media_links.facebook')}
+                        />
+                        <TextInput
+                            label="Instagram"
+                            placeholder="https://instagram.com/username"
+                            {...form.getInputProps('social_media_links.instagram')}
+                        />
+                        <TextInput
+                            label="Twitter"
+                            placeholder="https://twitter.com/username"
+                            {...form.getInputProps('social_media_links.twitter')}
+                        />
+                        <TextInput
+                            label="LinkedIn"
+                            placeholder="https://linkedin.com/in/username"
+                            {...form.getInputProps('social_media_links.linkedin')}
+                        />
+                        <TextInput
+                            label="Telegram"
+                            placeholder="@username"
+                            {...form.getInputProps('social_media_links.telegram')}
+                        />
+                    </div>
                     
-                    <Radio.Group
-                        label="Relationship Status"
-                        {...form.getInputProps('relationship_status')}
-                        mb="md"
-                    >
-                        <div className="flex flex-col space-y-2 mt-2">
-                            <Radio value="single" label="Single" />
-                            <Radio value="in_relationship" label="In a relationship" />
-                            <Radio value="married" label="Married" />
-                        </div>
-                    </Radio.Group>
-                    
-                    <div className="flex justify-end space-x-3 mt-6">
+                    <Group justify="flex-end" mt="xl">
                         <Button 
                             variant="default" 
                             onClick={() => setModalOpened(false)}
@@ -163,7 +304,7 @@ const PersonalInfo = () => {
                         >
                             Save Changes
                         </Button>
-                    </div>
+                    </Group>
                 </form>
             </Modal>
         </>
