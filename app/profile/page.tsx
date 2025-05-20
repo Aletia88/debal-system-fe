@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import PersonalInfo from "./components/personal-info"
 import LifestyleInfo from "./components/LifestyleInfo"
-import { FileInput, SimpleGrid, Stack } from "@mantine/core"
+import { FileInput, Modal, ModalContent, SimpleGrid, Stack } from "@mantine/core"
 import NeighborhoodInfo from "./components/NeighborhoodInfo"
 import WorkInfo from "./components/WorkInfo"
 import FoodInfo from "./components/FoodInfo"
@@ -19,25 +19,72 @@ import HobbiesInfo from "./components/Hobbies"
 import FinancialInfo from "./components/FinancialInfo"
 import PetsInfo from "./components/Pets"
 import SharedLivingInfo from "./components/SharedLivingInfo"
-import { useGetProfileQuery, useUpdateProfilePhotoMutation } from "@/store/profile"
+import { useGetProfileQuery, useRemoveProfilePhotoMutation, useSetProfilePhotoMutation, useUpdateProfilePhotoMutation } from "@/store/profile"
 import { useToast } from "@/hooks/use-toast"
 import Image from "next/image"
+import { useDisclosure } from "@mantine/hooks"
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
 export default function ProfilePage() {
   const { data: profile } = useGetProfileQuery({})
-  const [uploadPhotos] = useUpdateProfilePhotoMutation()
+  const [uploadPhotos] = useSetProfilePhotoMutation()
+  // const [deletePhoto] = useRemoveProfilePhotoMutation()
   const [updateProfilePhoto] = useUpdateProfilePhotoMutation()
   const { toast } = useToast()
-  
+  const [photoToDelete, setPhotoToDelete] = useState<string | null>(null);
+
   // State for image gallery
   const [selectedImageIndex, setSelectedImageIndex] = useState(null)
   const [isViewerOpen, setIsViewerOpen] = useState(false)
   const [files, setFiles] = useState<File[]>([])
+  const [opened, { open, close }] = useDisclosure(false);
 
-  console.log(`${baseUrl}${profile?.photos[0].url}/`)
- 
+  const profilePhoto = profile?.photos?.find(photo => photo.isProfile);
+  // console.log(`${baseUrl}${profilePhoto?.url}`)
 
+  const [removeProfilePhoto] = useRemoveProfilePhotoMutation();
+
+const handleDeleteClick = (filename: string) => {
+  setPhotoToDelete(filename);
+  open();
+};
+
+const confirmDelete = async () => {
+  if (!photoToDelete) return;
+  
+  try {
+    await removeProfilePhoto(photoToDelete).unwrap();
+    toast({
+      title: "Success",
+      description: "Photo deleted successfully",
+    });
+  } catch (error) {
+    toast({
+      title: "Failed to delete photo",
+      description: error.message || "Please try again",
+      variant: "destructive",
+    });
+  } finally {
+    close();
+    setPhotoToDelete(null);
+  }
+};
+  const handleSetProfilePhoto = async (filename: string) => {
+    try {
+      await uploadPhotos(filename).unwrap(); // Now passing just the filename
+      toast({
+        title: "Success",
+        description: "Profile photo updated successfully",
+      });
+      setIsViewerOpen(false);
+    } catch (error) {
+      toast({
+        title: "Failed to update profile photo",
+        description: error.message || "Please try again",
+        variant: "destructive",
+      });
+    }
+  };
   const handleImageUpload = async () => {
     if (files.length === 0) return
 
@@ -82,7 +129,10 @@ export default function ProfilePage() {
       <div className="bg-purple-900 py-12 mt-5 px-4 text-center text-white relative">
         <div className="absolute left-1/2 -top-12 transform -translate-x-1/2">
           <Avatar className="h-24 w-24 border-4 border-white bg-cover">
-            <AvatarImage src={profile?.photo_url || "/image.png"} alt="Profile" />
+            <AvatarImage
+              src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image.png"}
+              alt="Profile"
+            />
             <AvatarFallback>
               {profile?.user.name?.split(' ').map(n => n[0]).join('') || 'RU'}
             </AvatarFallback>
@@ -108,7 +158,7 @@ export default function ProfilePage() {
 
       {/* Photo Upload Section */}
       <div className="container mx-auto px-4 mt-8">
-      <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
+        <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-800">Photos</h3>
             <div className="flex gap-2">
@@ -120,7 +170,7 @@ export default function ProfilePage() {
                 placeholder="Select photos"
                 className="w-64"
               />
-              <Button 
+              <Button
                 onClick={handleImageUpload}
                 disabled={files.length === 0}
                 className="bg-purple-600 hover:bg-purple-700"
@@ -132,42 +182,54 @@ export default function ProfilePage() {
           </div>
 
           {profile?.photos?.length > 0 ? (
-            <div className="flex flex-wrap gap-4 mt-4">
-              {profile.photos.map((photo, index) => (
-                <div key={photo.id || index} className="relative group">
-                  <Image
-                    src={`${baseUrl}${photo.url}`}
-                    alt={`${baseUrl}`}
-                    width={96}
-                    height={96}
-                    className="w-24 h-24 rounded-md object-cover cursor-pointer border-2 border-transparent hover:border-purple-500 transition-all"
-                    onClick={() => {
-                      setSelectedImageIndex(index)
-                      setIsViewerOpen(true)
-                    }}
-                  />
-                  <div className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 w-8 p-0 bg-white hover:bg-gray-100"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleSetProfilePhoto(photo.url)
-                      }}
-                      title="Set as profile photo"
-                    >
-                      <Check size={16} className="text-purple-600" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              <p>No photos uploaded yet</p>
-            </div>
-          )}
+  <div className="flex flex-wrap gap-2 mt-4">
+    {profile.photos.map((photo, index) => (
+      <div key={photo.id || index} className="relative group">
+        <Image
+          src={`${baseUrl}${photo.url}`}
+          alt={`${baseUrl}`}
+          width={96}
+          height={96}
+          className="w-24 h-24 rounded-md object-cover cursor-pointer border-2 border-transparent hover:border-purple-500 transition-all"
+          onClick={() => {
+            setSelectedImageIndex(index)
+            setIsViewerOpen(true)
+          }}
+        />
+        <div className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 bg-white hover:bg-gray-100"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSetProfilePhoto(photo.filename);
+            }}
+            title="Set as profile photo"
+          >
+            <Check size={16} className="text-purple-600" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 bg-white hover:bg-gray-100"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDeleteClick(photo.filename);
+            }}
+            title="Delete photo"
+          >
+            <Trash2 size={16} className="text-red-600" />
+          </Button>
+        </div>
+      </div>
+    ))}
+  </div>
+) : (
+  <div className="text-center py-8 text-gray-500">
+    <p>No photos uploaded yet</p>
+  </div>
+)}
         </div>
 
 
@@ -183,37 +245,37 @@ export default function ProfilePage() {
                 className="max-w-full max-h-[80vh] object-contain"
               />
               <div className="absolute top-4 right-4">
-                <Button 
-                  variant="default" 
+                <Button
+                  variant="default"
                   className="bg-white text-gray-800 hover:bg-gray-100"
-                  onClick={() => handleSetProfilePhoto(profile.photos[selectedImageIndex].url)}
+                  onClick={() => handleSetProfilePhoto(profile.photos[selectedImageIndex].filename)}
                 >
                   <Check size={16} className="mr-2" />
                   Set as Profile Photo
                 </Button>
               </div>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="icon"
                 className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-gray-100"
-                onClick={() => setSelectedImageIndex(prev => 
+                onClick={() => setSelectedImageIndex(prev =>
                   prev === 0 ? profile.photos.length - 1 : prev - 1
                 )}
               >
                 <ChevronLeft size={24} />
               </Button>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="icon"
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-gray-100"
-                onClick={() => setSelectedImageIndex(prev => 
+                onClick={() => setSelectedImageIndex(prev =>
                   prev === profile.photos.length - 1 ? 0 : prev + 1
                 )}
               >
                 <ChevronRight size={24} />
               </Button>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="icon"
                 className="absolute top-4 left-4 bg-white hover:bg-gray-100"
                 onClick={() => setIsViewerOpen(false)}
@@ -228,6 +290,29 @@ export default function ProfilePage() {
           <Stack><PersonalInfo /><NeighborhoodInfo /> <WorkInfo /> <HobbiesInfo /> <PetsInfo /></Stack>
           <Stack><LifestyleInfo /> <FoodInfo /> <FinancialInfo /> <SharedLivingInfo /></Stack>
         </SimpleGrid>
+        <Modal
+  opened={opened}
+  onClose={close}
+  title="Delete Photo"
+  centered
+  overlayProps={{
+    blur: 3,
+  }}
+>
+  <p>Are you sure you want to delete this photo?</p>
+  <div className="flex justify-end gap-3 mt-4">
+    <Button variant="default" onClick={close}>
+      Cancel
+    </Button>
+    <Button 
+      color="red" 
+      onClick={confirmDelete}
+      // loading={removeProfilePhoto.isLoading}
+    >
+      Delete
+    </Button>
+  </div>
+</Modal>
       </div>
     </div>
   )
