@@ -3,11 +3,16 @@ import { Check, Pencil } from 'lucide-react';
 import { useGetProfileQuery, useUpdateHobbiesMutation } from "@/store/profile";
 import { Modal, Button, MultiSelect } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useParams } from 'next/navigation';
 
 const HobbiesInfo = () => {
     const { data: profile } = useGetProfileQuery({});
     const [updateHobbies, { isLoading }] = useUpdateHobbiesMutation();
     const [modalOpened, setModalOpened] = useState(false);
+
+    const {id} = useParams()
+
+    const isCurrentUserProfile = id ?  profile?.user._id === id : true;
 
     const hobbiesOptions = ['reading', 'sports', 'travelling', 'music', 'movies', 'gaming', 'cooking', 'art','board games'];
 
@@ -49,12 +54,14 @@ const HobbiesInfo = () => {
                             </span>
                         )}
                     </h3>
-                    <button 
-                        className="text-purple-600 hover:text-purple-800"
-                        onClick={() => setModalOpened(true)}
-                    >
-                        <Pencil size={16} />
-                    </button>
+                    {isCurrentUserProfile && (
+                        <button 
+                            className="text-purple-600 hover:text-purple-800"
+                            onClick={() => setModalOpened(true)}
+                        >
+                            <Pencil size={16} />
+                        </button>
+                    )}
                 </div>
 
                 <div className="space-y-2">

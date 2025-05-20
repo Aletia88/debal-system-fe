@@ -3,12 +3,16 @@ import { Check, Pencil } from 'lucide-react';
 import { useGetProfileQuery, useUpdatePetsMutation } from "@/store/profile";
 import { Modal, Button, Switch, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useParams } from 'next/navigation';
 
 const PetsInfo = () => {
     const { data: profile } = useGetProfileQuery({});
     const [updatePets, { isLoading }] = useUpdatePetsMutation();
     const [modalOpened, setModalOpened] = useState(false);
 
+    const {id} = useParams()
+
+    const isCurrentUserProfile = id ?  profile?.user._id === id : true;
     const form = useForm({
         initialValues: {
             has_pets: false,
@@ -50,12 +54,14 @@ const PetsInfo = () => {
                             </span>
                         )}
                     </h3>
-                    <button 
-                        className="text-purple-600 hover:text-purple-800"
-                        onClick={() => setModalOpened(true)}
-                    >
-                        <Pencil size={16} />
-                    </button>
+                    {isCurrentUserProfile && (
+                        <button 
+                            className="text-purple-600 hover:text-purple-800"
+                            onClick={() => setModalOpened(true)}
+                        >
+                            <Pencil size={16} />
+                        </button>
+                    )}
                 </div>
 
                 <div className="space-y-4">

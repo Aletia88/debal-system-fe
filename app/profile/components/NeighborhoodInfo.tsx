@@ -3,11 +3,16 @@ import { Check, Pencil } from 'lucide-react';
 import { useGetProfileQuery, useUpdateNeighborhoodMutation } from "@/store/profile";
 import { Modal, Button, Select, NumberInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useParams } from 'next/navigation';
 
 const NeighborhoodInfo = () => {
     const { data: profile } = useGetProfileQuery({});
     const [updateNeighborhood, { isLoading }] = useUpdateNeighborhoodMutation();
     const [modalOpened, setModalOpened] = useState(false);
+
+    const {id} = useParams()
+
+    const isCurrentUserProfile = id ?  profile?.user._id === id : true;
 
     const form = useForm({
         initialValues: {
@@ -49,12 +54,14 @@ const NeighborhoodInfo = () => {
                             </span>
                         )}
                     </h3>
-                    <button 
-                        className="text-purple-600 hover:text-purple-800"
-                        onClick={() => setModalOpened(true)}
-                    >
-                        <Pencil size={16} />
-                    </button>
+                    {isCurrentUserProfile && (
+                        <button 
+                            className="text-purple-600 hover:text-purple-800"
+                            onClick={() => setModalOpened(true)}
+                        >
+                            <Pencil size={16} />
+                        </button>
+                    )}
                 </div>
 
                 <div className="space-y-4">

@@ -44,31 +44,31 @@ export default function ProfilePage() {
 
   const [removeProfilePhoto] = useRemoveProfilePhotoMutation();
 
-const handleDeleteClick = (filename: string) => {
-  setPhotoToDelete(filename);
-  open();
-};
+  const handleDeleteClick = (filename: string) => {
+    setPhotoToDelete(filename);
+    open();
+  };
 
-const confirmDelete = async () => {
-  if (!photoToDelete) return;
-  
-  try {
-    await removeProfilePhoto(photoToDelete).unwrap();
-    toast({
-      title: "Success",
-      description: "Photo deleted successfully",
-    });
-  } catch (error) {
-    toast({
-      title: "Failed to delete photo",
-      description: error.message || "Please try again",
-      variant: "destructive",
-    });
-  } finally {
-    close();
-    setPhotoToDelete(null);
-  }
-};
+  const confirmDelete = async () => {
+    if (!photoToDelete) return;
+
+    try {
+      await removeProfilePhoto(photoToDelete).unwrap();
+      toast({
+        title: "Success",
+        description: "Photo deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to delete photo",
+        description: error.message || "Please try again",
+        variant: "destructive",
+      });
+    } finally {
+      close();
+      setPhotoToDelete(null);
+    }
+  };
   const handleSetProfilePhoto = async (filename: string) => {
     try {
       await uploadPhotos(filename).unwrap(); // Now passing just the filename
@@ -182,54 +182,54 @@ const confirmDelete = async () => {
           </div>
 
           {profile?.photos?.length > 0 ? (
-  <div className="flex flex-wrap gap-2 mt-4">
-    {profile.photos.map((photo, index) => (
-      <div key={photo.id || index} className="relative group">
-        <Image
-          src={`${baseUrl}${photo.url}`}
-          alt={`${baseUrl}`}
-          width={96}
-          height={96}
-          className="w-24 h-24 rounded-md object-cover cursor-pointer border-2 border-transparent hover:border-purple-500 transition-all"
-          onClick={() => {
-            setSelectedImageIndex(index)
-            setIsViewerOpen(true)
-          }}
-        />
-        <div className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 bg-white hover:bg-gray-100"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleSetProfilePhoto(photo.filename);
-            }}
-            title="Set as profile photo"
-          >
-            <Check size={16} className="text-purple-600" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 bg-white hover:bg-gray-100"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDeleteClick(photo.filename);
-            }}
-            title="Delete photo"
-          >
-            <Trash2 size={16} className="text-red-600" />
-          </Button>
-        </div>
-      </div>
-    ))}
-  </div>
-) : (
-  <div className="text-center py-8 text-gray-500">
-    <p>No photos uploaded yet</p>
-  </div>
-)}
+            <div className="flex flex-wrap gap-2 mt-4">
+              {profile.photos.map((photo, index) => (
+                <div key={photo.id || index} className="relative group">
+                  <Image
+                    src={`${baseUrl}${photo.url}`}
+                    alt={`${baseUrl}`}
+                    width={96}
+                    height={96}
+                    className="w-24 h-24 rounded-md object-cover cursor-pointer border-2 border-transparent hover:border-purple-500 transition-all"
+                    onClick={() => {
+                      setSelectedImageIndex(index)
+                      setIsViewerOpen(true)
+                    }}
+                  />
+                  <div className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 bg-white hover:bg-gray-100"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSetProfilePhoto(photo.filename);
+                      }}
+                      title="Set as profile photo"
+                    >
+                      <Check size={16} className="text-purple-600" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 bg-white hover:bg-gray-100"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(photo.filename);
+                      }}
+                      title="Delete photo"
+                    >
+                      <Trash2 size={16} className="text-red-600" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <p>No photos uploaded yet</p>
+            </div>
+          )}
         </div>
 
 
@@ -291,28 +291,28 @@ const confirmDelete = async () => {
           <Stack><LifestyleInfo /> <FoodInfo /> <FinancialInfo /> <SharedLivingInfo /></Stack>
         </SimpleGrid>
         <Modal
-  opened={opened}
-  onClose={close}
-  title="Delete Photo"
-  centered
-  overlayProps={{
-    blur: 3,
-  }}
->
-  <p>Are you sure you want to delete this photo?</p>
-  <div className="flex justify-end gap-3 mt-4">
-    <Button variant="default" onClick={close}>
-      Cancel
-    </Button>
-    <Button 
-      color="red" 
-      onClick={confirmDelete}
-      // loading={removeProfilePhoto.isLoading}
-    >
-      Delete
-    </Button>
-  </div>
-</Modal>
+          opened={opened}
+          onClose={close}
+          title="Delete Photo"
+          centered
+          overlayProps={{
+            blur: 3,
+          }}
+        >
+          <p>Are you sure you want to delete this photo?</p>
+          <div className="flex justify-end gap-3 mt-4">
+            <Button variant="default" onClick={close}>
+              Cancel
+            </Button>
+            <Button
+              color="red"
+              onClick={confirmDelete}
+            // loading={removeProfilePhoto.isLoading}
+            >
+              Delete
+            </Button>
+          </div>
+        </Modal>
       </div>
     </div>
   )

@@ -4,11 +4,15 @@ import { Check, Pencil } from 'lucide-react';
 import { useGetProfileQuery, useUpdatePersonalInfoMutation } from "@/store/profile";
 import { Modal, Button, TextInput, Select, Radio, Textarea, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useParams } from 'next/navigation';
 
 const PersonalInfo = () => {
     const { data: profile } = useGetProfileQuery({});
     const [updatePersonalInfo, { isLoading }] = useUpdatePersonalInfoMutation();
     const [modalOpened, setModalOpened] = useState(false);
+    const {id} = useParams()
+
+    const isCurrentUserProfile = id ?  profile?.user._id === id : true;
 
     const form = useForm({
         initialValues: {
@@ -96,12 +100,14 @@ const PersonalInfo = () => {
                             </span>
                         )}
                     </h3>
-                    <button 
-                        className="text-purple-600 hover:text-purple-800"
-                        onClick={() => setModalOpened(true)}
-                    >
-                        <Pencil size={16} />
-                    </button>
+                    {isCurrentUserProfile && (
+                        <button 
+                            className="text-purple-600 hover:text-purple-800"
+                            onClick={() => setModalOpened(true)}
+                        >
+                            <Pencil size={16} />
+                        </button>
+                    )}
                 </div>
 
                 <div className="space-y-4">

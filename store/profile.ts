@@ -32,6 +32,10 @@ export const ProfileApi = createApi({
             query: () => "/profiles/me",
             providesTags: ["profiles"],
         }),
+        getProfileById: builder.query({
+            query: (id) =>`/profiles/user/${id}`,
+            providesTags: ["profiles"],
+        }),
 
         // Personal Info
         updatePersonalInfo: builder.mutation({
@@ -180,5 +184,6 @@ export const {
     useMarkCompleteMutation,
     useUpdateProfilePhotoMutation,
     useSetProfilePhotoMutation,
-    useRemoveProfilePhotoMutation
+    useRemoveProfilePhotoMutation,
+    useGetProfileByIdQuery
 } = ProfileApi;

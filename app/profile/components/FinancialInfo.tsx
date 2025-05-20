@@ -3,11 +3,16 @@ import { Check, Pencil } from 'lucide-react';
 import { useGetProfileQuery, useUpdateFinancialMutation } from "@/store/profile";
 import { Modal, Button, Select, NumberInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useParams } from 'next/navigation';
 
 const FinancialInfo = () => {
     const { data: profile } = useGetProfileQuery({});
     const [updateFinancial, { isLoading }] = useUpdateFinancialMutation();
     const [modalOpened, setModalOpened] = useState(false);
+
+    const {id} = useParams()
+
+    const isCurrentUserProfile = id ?  profile?.user._id === id : true;
 
     const incomeLevels = [
         'Under 30,000',
@@ -62,12 +67,14 @@ const FinancialInfo = () => {
                             </span>
                         )}
                     </h3>
-                    <button 
-                        className="text-purple-600 hover:text-purple-800"
-                        onClick={() => setModalOpened(true)}
-                    >
-                        <Pencil size={16} />
-                    </button>
+                    {isCurrentUserProfile && (
+                        <button 
+                            className="text-purple-600 hover:text-purple-800"
+                            onClick={() => setModalOpened(true)}
+                        >
+                            <Pencil size={16} />
+                        </button>
+                    )}
                 </div>
 
                 <div className="space-y-4">
