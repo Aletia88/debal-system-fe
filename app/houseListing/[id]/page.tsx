@@ -9,6 +9,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useGetProfileQuery } from '@/store/profile';
 import { IconTrash, IconUpload } from '@tabler/icons-react';
+import ProviderInfo from './PersonalInfo';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
 
@@ -26,7 +27,7 @@ export default function ListingDetailPage() {
   const [deleteImage] = useDeleteListingImageMutation();
   const { data: profile } = useGetProfileQuery({});
 
-  const isMyListing = listing?.user_id._id === profile?.user._id;
+  const isMyListing = listing?.user_id === profile?.user._id;
 
   const handleDelete = async () => {
     try {
@@ -331,15 +332,14 @@ export default function ListingDetailPage() {
             </p>
             {/* You can add a map component here using the coordinates */}
           </div>
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">Provider Information</h2>
-            <ul>
-              <li>
-                {listing.user_id.name}
-              </li>
-            </ul>
-            {/* You can add a map component here using the coordinates */}
-          </div>
+          <ProviderInfo 
+  listing={listing} 
+  onStartChat={(userId:any) => {
+    // Handle starting a new chat with this user
+    // This could open your chat dialog or redirect to chat page
+    console.log('Start chat with user:', userId);
+  }}
+/>
         {/* </div> */}
 
           {/* ... rest of your existing listing details ... */}
