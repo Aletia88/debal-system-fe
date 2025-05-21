@@ -2,20 +2,13 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { MessageCircle, Filter } from 'lucide-react'; // Added Filter icon
+import { MessageCircle, Filter } from 'lucide-react';
 import { MatchCard } from '@/components/MatchCard';
 import { ChatWindow } from '@/components/Chat/ChatWindow';
 import { useChat } from '@/hooks/useChat';
 import { Chat } from '@/types/chat';
 import FilterSidebar from '@/components/filter-sidebar';
 import { useGetProfileByRecommendationQuery } from '@/store/profile';
-
-const matches = [
-  { id: 1, name: "Rebecca Oyebanji", matchPercentage: 80, image: "/image.png" },
-  { id: 2, name: "Alex Johnson", matchPercentage: 75, image: "/image.png" },
-  { id: 3, name: "Sarah Williams", matchPercentage: 90, image: "/image.png" },
-  { id: 4, name: "Michael Brown", matchPercentage: 65, image: "/image.png" },
-];
 
 const chats: Chat[] = [
   { id: 1, name: "Rebecca Oyebanji", lastMessage: "You are you! When do you plan on moving...", unread: 3, online: true },
@@ -31,11 +24,15 @@ export default function MatchesPage() {
   const [minimized, setMinimized] = useState(false);
   const [activeChat, setActiveChat] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [showFilter, setShowFilter] = useState(false); // Changed to false by default
-  const {data:recommendation} = useGetProfileByRecommendationQuery({})
+  const [showFilter, setShowFilter] = useState(false);
+  
+  // Destructure the query result properly
+  const { data: recommendations, isLoading, isError } = useGetProfileByRecommendationQuery({});
 
-  const handleMessageClick = (userId: number) => {
-    setActiveChat(userId);
+  const handleMessageClick = (userId: string) => { // Changed to string since _id is string
+    // Find the numeric ID if needed, or adjust your chat system to use string IDs
+    const numericId = parseInt(userId, 10) || 1; // Fallback to 1 if conversion fails
+    setActiveChat(numericId);
     setChatOpen(true);
     setMinimized(false);
     setSidebarOpen(false);
@@ -45,19 +42,36 @@ export default function MatchesPage() {
   const toggleMinimize = () => setMinimized(!minimized);
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const toggleFilter = () => setShowFilter(!showFilter);
-   // Added toggle function
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-purple-900">Loading matches...</div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-red-500">Error loading matches. Please try again later.</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Filter Sidebar */}
       {showFilter && (
-        <aside className=" bg-white shadow-md transition-all duration-300 ease-in-out">
+        <aside className="bg-white shadow-md transition-all duration-300 ease-in-out">
           <FilterSidebar onClose={() => setShowFilter(false)} />
         </aside>
       )}
       
       <div className="flex-1">
-        <main className="container mx-auto  px-4 py-6">
+        <main className="container mx-auto px-4 py-6">
           {/* Filter Button */}
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-purple-900">Your Matches</h1>
@@ -70,25 +84,25 @@ export default function MatchesPage() {
             </button>
           </div>
           
-          <p className="text-gray-500 mb-6">Holla!, Fill in the details to complete sign up</p>
+          <p className="text-gray-500 mb-6">Find your perfect roommate match!</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {matches.map((user) => (
+            {/* Safely render recommendations */}
+            {recommendations?.recommendations?.map((reco) => (
               <MatchCard 
-              user={{
-                id: 1,
-                name: "Rebecca Oyebanji",
-                matchPercentage: 80,
-                image: "/image.png",
-                age: 28,
-                location: "New York",
-                bio: "Love hiking and photography. Looking for someone to share adventures with!",
-                interests: ["Hiking", "Photography", "Travel"]
-              }}
-              onMessageClick={handleMessageClick}
-              onLikeToggle={(userId, liked) => console.log(`User ${userId} liked: ${liked}`)}
-            />
+                key={reco.user_id}
+                recommendation={reco}
+                onMessageClick={handleMessageClick}
+                onLikeToggle={(userId, liked) => console.log(`User ${userId} liked: ${liked}`)}
+              />
             ))}
+
+            {/* Fallback if no recommendations */}
+            {(!recommendations || recommendations.recommendations?.length === 0) && (
+              <div className="col-span-full text-center py-10 text-gray-500">
+                No matches found. Try adjusting your filters.
+              </div>
+            )}
           </div>
         </main>
 

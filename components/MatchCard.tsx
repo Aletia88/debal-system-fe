@@ -1,48 +1,89 @@
 'use client';
 
 import Image from "next/image";
-import { Eye, Heart, MessageCircle, Phone } from "lucide-react";
+import { Contact, Contact2, ContactIcon, Eye, Heart, MessageCircle, Phone } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
-interface MatchCardProps {
-  user: {
-    id: number;
-    name: string;
-    matchPercentage: number;
-    image: string;
-    // Add more user details for the modal
-    age?: number;
-    location?: string;
-    bio?: string;
-    interests?: string[];
+interface RecommendationUser {
+  _id: string;
+  name: string;
+  email: string;
+  personalInfo: {
+    age: number;
+    gender: string;
+    occupation: string;
+    religion: string;
+    relationship_status: string;
   };
-  onMessageClick: (userId: number) => void;
-  onLikeToggle?: (userId: number, liked: boolean) => void;
+  lifestyle: {
+    personality_type: string;
+    daily_routine: string;
+    sleep_pattern: string;
+  };
+  hobbies: string[];
+  sharedLiving: {
+    cleanliness_level: string;
+    chore_sharing_preference: string;
+    noise_tolerance: string;
+    guest_frequency: string;
+    party_habits: string;
+  };
 }
 
-export const MatchCard = ({ user, onMessageClick, onLikeToggle }: MatchCardProps) => {
+interface MatchCardProps {
+  recommendation: {
+    user_id: string;
+    compatibility_score: number;
+    cluster_id: number;
+    age: number;
+    gender: string;
+    personality_type: string;
+    hobbies: string[];
+    // user: {
+      user: RecommendationUser;
+    // };
+  };
+  onMessageClick: (userId: string) => void;
+  onLikeToggle?: (userId: string, liked: boolean) => void;
+}
+
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
+export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: MatchCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter()
+  const handleStartChat = (id:any) => {
+    // Navigate to chat page with user ID as query parameter
+    router.push(`/chat?newChat=${id}`);
+  };
+  
+
 
   const toggleLike = () => {
     const newLikedState = !isLiked;
     setIsLiked(newLikedState);
     if (onLikeToggle) {
-      onLikeToggle(user.id, newLikedState);
+      onLikeToggle(recommendation.user_id, newLikedState);
     }
   };
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  // Handle card click (but don't trigger for buttons inside the card)
   const handleCardClick = (e: React.MouseEvent) => {
-    // Check if the click was on the card itself, not a button inside it
     if ((e.target as HTMLElement).closest('button') === null) {
       openModal();
     }
   };
+
+  const matchPercentage = Math.round(recommendation.compatibility_score * 100);
+  const user = recommendation.user;
+  const profilePhoto = user?.photos?.find((photo:any) => photo.isProfile);
+
+  console.log('user',user)
+  console.log('rec',recommendation)
 
   return (
     <>
@@ -52,7 +93,7 @@ export const MatchCard = ({ user, onMessageClick, onLikeToggle }: MatchCardProps
       >
         <div className="relative h-48">
           <Image 
-            src={user.image || "/image.png"} 
+            src="/image.png" 
             alt={user.name} 
             fill 
             className="object-cover" 
@@ -81,10 +122,10 @@ export const MatchCard = ({ user, onMessageClick, onLikeToggle }: MatchCardProps
           </button>
         </div>
         <div className="p-4">
-          <h3 className="font-bold text-lg">{user.name}</h3>
+          <h3 className="font-bold text-lg">{user.user.name}</h3>
           <div className="flex justify-between items-center mt-2">
             <div className="flex items-center">
-              <div className="text-orange-400 font-bold">{user.matchPercentage}%</div>
+              <div className="text-orange-400 font-bold">{matchPercentage}%</div>
               <div className="text-xs text-gray-400 ml-1">Match</div>
             </div>
             <div className="flex space-x-2">
@@ -92,16 +133,16 @@ export const MatchCard = ({ user, onMessageClick, onLikeToggle }: MatchCardProps
                 className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onMessageClick(user.id);
+                  handleStartChat(user.user._id)
                 }}
               >
                 <MessageCircle size={18} />
               </button>
-              <button 
+              <button  
                 className="p-2 bg-white border border-gray-300 text-gray-600 rounded-full hover:bg-gray-50"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Phone size={18} />
+                <Contact2 onClick={() => router.push(`/profile/${user.user._id}`)} size={18} />
               </button>
             </div>
           </div>
@@ -117,7 +158,7 @@ export const MatchCard = ({ user, onMessageClick, onLikeToggle }: MatchCardProps
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative h-64 w-full rounded-lg overflow-hidden">
               <Image
-                src={user.image || "/image.png"}
+                src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image.png"}
                 alt={user.name}
                 fill
                 className="object-cover"
@@ -126,7 +167,7 @@ export const MatchCard = ({ user, onMessageClick, onLikeToggle }: MatchCardProps
             <div className="space-y-4">
               <div className="flex items-center space-x-4">
                 <div className="text-orange-400 font-bold text-xl">
-                  {user.matchPercentage}% Match
+                  {matchPercentage}% Match
                 </div>
                 <button 
                   onClick={toggleLike}
@@ -140,37 +181,36 @@ export const MatchCard = ({ user, onMessageClick, onLikeToggle }: MatchCardProps
                 </button>
               </div>
               
-              {user.age && (
-                <div>
-                  <h4 className="text-sm text-gray-500">Age</h4>
-                  <p className="font-medium">{user.age}</p>
-                </div>
-              )}
+              <div>
+                <h4 className="text-sm text-gray-500">Age</h4>
+                <p className="font-medium">{user.personalInfo.age}</p>
+              </div>
               
-              {user.location && (
-                <div>
-                  <h4 className="text-sm text-gray-500">Location</h4>
-                  <p className="font-medium">{user.location}</p>
-                </div>
-              )}
+              <div>
+                <h4 className="text-sm text-gray-500">Occupation</h4>
+                <p className="font-medium">{user.personalInfo.occupation}</p>
+              </div>
               
-              {user.bio && (
-                <div>
-                  <h4 className="text-sm text-gray-500">About</h4>
-                  <p className="font-medium">{user.bio}</p>
-                </div>
-              )}
+              <div>
+                <h4 className="text-sm text-gray-500">Personality</h4>
+                <p className="font-medium">{user.lifestyle.personality_type}</p>
+              </div>
               
-              {user.interests && user.interests.length > 0 && (
+              <div>
+                <h4 className="text-sm text-gray-500">Daily Routine</h4>
+                <p className="font-medium">{user.lifestyle.daily_routine}</p>
+              </div>
+              
+              {recommendation.hobbies.length > 0 && (
                 <div>
-                  <h4 className="text-sm text-gray-500">Interests</h4>
+                  <h4 className="text-sm text-gray-500">Hobbies</h4>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {user.interests.map((interest, index) => (
+                    {recommendation.hobbies.map((hobby, index) => (
                       <span 
                         key={index} 
                         className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
                       >
-                        {interest}
+                        {hobby}
                       </span>
                     ))}
                   </div>
@@ -181,16 +221,17 @@ export const MatchCard = ({ user, onMessageClick, onLikeToggle }: MatchCardProps
                 <button 
                   className="flex-1 flex items-center justify-center gap-2 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700"
                   onClick={() => {
-                    onMessageClick(user.id);
+                    // onMessageClick(user._id);
                     closeModal();
+                    handleStartChat(user.user._id)
                   }}
                 >
                   <MessageCircle size={18} />
                   Message
                 </button>
-                <button className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50">
-                  <Phone size={18} />
-                  Call
+                <button onClick={() => router.push(`/profile/${user.user._id}`)} className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50">
+                  <Contact2 size={18} />
+                  Profile
                 </button>
               </div>
             </div>
