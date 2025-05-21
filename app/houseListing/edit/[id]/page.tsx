@@ -44,8 +44,8 @@ export default function EditListingPage() {
       bathrooms: 1,
       rent: {
         amount: 0,
-        currency: 'USD',
-        period: 'month',
+        // currency: 'BIRR',
+        frequency: 'monthly',
       },
       address: {
         street: '',
@@ -78,8 +78,8 @@ export default function EditListingPage() {
         bathrooms: listing.bathrooms,
         rent: {
           amount: listing.rent.amount,
-          currency: listing.rent.currency || 'USD',
-          period: listing.rent.period || 'month',
+          // currency: listing.rent.currency || 'BIRR',
+          frequency: listing.rent.frequency || 'month',
         },
         address: {
           street: listing.address.street,
@@ -87,14 +87,13 @@ export default function EditListingPage() {
           state: listing.address.state,
           zipCode: listing.address.zipCode,
         },
-        house_rules: listing.rules || [], // Now expecting array of house_rules IDs
+        house_rules: listing.house_rules?.map(rule => rule._id) || [], // Extract just the IDs
         amenities: listing.amenities || [],
         availableFrom: new Date(listing.availableFrom),
         status: listing.status || 'available',
       });
     }
   }, [listing]);
-
   const handleSubmit = async (values: typeof form.values) => {
     setIsSubmitting(true);
     try {
@@ -195,26 +194,26 @@ export default function EditListingPage() {
                   // precision={2}
                   required
                 />
-                <Select
+                {/* <Select
                   label="Currency"
                   placeholder="Select currency"
                   data={[
-                    { value: 'USD', label: 'USD' },
+                    { value: 'BIRR', label: 'BIRR' },
                     { value: 'EUR', label: 'EUR' },
                     { value: 'GBP', label: 'GBP' },
                   ]}
                   {...form.getInputProps('rent.currency')}
                   required
-                />
+                /> */}
                 <Select
                   label="Period"
-                  placeholder="Select period"
+                  placeholder="Select frequency"
                   data={[
                     { value: 'month', label: 'Per Month' },
                     { value: 'week', label: 'Per Week' },
                     { value: 'day', label: 'Per Day' },
                   ]}
-                  {...form.getInputProps('rent.period')}
+                  {...form.getInputProps('rent.frequency')}
                   required
                 />
               </Group>
@@ -270,14 +269,15 @@ export default function EditListingPage() {
               
               <Title order={4} mb="sm">House Rules</Title>
               {activeRules.length > 0 ? (
-                <MultiSelect
-                  label="Select applicable rules"
-                  placeholder="Choose house rules"
-                  data={rulesOptions}
-                  {...form.getInputProps('house_rules')}
-                  searchable
-                  clearable
-                />
+               <MultiSelect
+               label="House Rules"
+               placeholder="Select rules"
+               data={rulesOptions}
+               value={form.values.house_rules}
+               onChange={(selectedIds) => form.setFieldValue('house_rules', selectedIds)}
+               searchable
+               clearable
+             />
               ) : (
                 <Badge color="yellow" variant="light">No active house rules available</Badge>
               )}

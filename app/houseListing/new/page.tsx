@@ -37,7 +37,7 @@ export default function CreateListingPage() {
       bathrooms: 1,
       rent: {
         amount: 0,
-        currency: 'USD',
+        currency: 'BIRR',
         period: 'month',
       },
       address: {
@@ -189,16 +189,20 @@ export default function CreateListingPage() {
                 {...form.getInputProps('rent.amount')}
                 required
               />
-              <Select
+              {/* <Select
                 label="Currency"
                 data={[
-                  { value: 'USD', label: 'USD' },
-                  { value: 'EUR', label: 'EUR' },
-                  { value: 'GBP', label: 'GBP' },
+                  { value: 'BIRR', label: 'BIRR' },
+                  { value: 'BIRR', label: 'BIRR' },
                 ]}
                 {...form.getInputProps('rent.currency')}
                 required
-              />
+              /> */}
+              {/* <TextInput 
+              label='Currency'
+              required
+              {...form.getInputProps('rent.currency')}
+              /> */}
               <Select
                 label="Period"
                 data={[

@@ -5,7 +5,7 @@ import { Button, SimpleGrid, Stack } from "@mantine/core"
 import { Twitter, Facebook, Instagram, Check, ChevronLeft, ChevronRight, X } from "lucide-react"
 import Image from "next/image"
 import { useParams } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import FinancialInfo from "../components/FinancialInfo"
 import FoodInfo from "../components/FoodInfo"
 import HobbiesInfo from "../components/Hobbies"
@@ -15,6 +15,7 @@ import PersonalInfo from "../components/personal-info"
 import PetsInfo from "../components/Pets"
 import SharedLivingInfo from "../components/SharedLivingInfo"
 import WorkInfo from "../components/WorkInfo"
+import ProfileInfo from "../components/ProviderInfo"
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
 const ProfileDetail = () => {
@@ -23,7 +24,17 @@ const ProfileDetail = () => {
   const profilePhoto = profile?.photos?.find((photo:any) => photo.isProfile);
     const [selectedImageIndex, setSelectedImageIndex] = useState(null)
     const [isViewerOpen, setIsViewerOpen] = useState(false)
+    const [userRole, setUserRole] = useState<'user' | 'houseprovider' | null>(null);
 
+    useEffect(() => {
+        // Check if we have profile data and determine the role
+        if (profile?.user.role) {
+          setUserRole(profile.user.role);
+        }
+      }, [profile]);
+
+      console.log('role' , profile)
+    
     return (
         <div className="min-h-screen bg-gray-50 pb-16">
         {/* Profile Header */}
@@ -103,7 +114,7 @@ const ProfileDetail = () => {
                 variant="ghost"
                 size="icon"
                 className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-gray-100"
-                onClick={() => setSelectedImageIndex(prev =>
+                onClick={() => setSelectedImageIndex((prev:any) =>
                   prev === 0 ? profile.photos.length - 1 : prev - 1
                 )}
               >
@@ -113,7 +124,7 @@ const ProfileDetail = () => {
                 variant="ghost"
                 size="icon"
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-gray-100"
-                onClick={() => setSelectedImageIndex(prev =>
+                onClick={() => setSelectedImageIndex((prev:any) =>
                   prev === profile.photos.length - 1 ? 0 : prev + 1
                 )}
               >
@@ -130,10 +141,14 @@ const ProfileDetail = () => {
             </div>
           </div>
         )}
-        <SimpleGrid cols={2}>
+        {userRole == 'houseprovider' ? 
+         <SimpleGrid cols={{ base: 1, sm: 2,  }}>
+        <ProfileInfo /> 
+        </SimpleGrid>:
+        <SimpleGrid cols={{ base: 1, sm: 2,  }}>
           <Stack><PersonalInfo /><NeighborhoodInfo /> <WorkInfo /> <HobbiesInfo /> <PetsInfo /></Stack>
           <Stack><LifestyleInfo /> <FoodInfo /> <FinancialInfo /> <SharedLivingInfo /></Stack>
-        </SimpleGrid>
+        </SimpleGrid>}
         </div>
         </div>
 

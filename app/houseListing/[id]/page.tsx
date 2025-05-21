@@ -10,6 +10,7 @@ import { notifications } from '@mantine/notifications';
 import { useGetProfileQuery } from '@/store/profile';
 import { IconEdit, IconTrash, IconUpload } from '@tabler/icons-react';
 import ProviderInfo from './PersonalInfo';
+import { HouseRulesDisplay } from './houserule';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
 
@@ -276,7 +277,7 @@ export default function ListingDetailPage() {
           <h1 className="text-3xl font-bold mb-2">{listing.title}</h1>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-2xl font-semibold">
-              {listing.rent?.amount} {listing.rent?.currency}/{listing.rent?.period}
+              {listing.rent?.amount} BIRR / {listing.rent?.frequency ?? "Monthly"}
             </span>
             <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
               {listing.status}
@@ -301,10 +302,10 @@ export default function ListingDetailPage() {
               <h3 className="font-semibold text-gray-600">Available From</h3>
               <p>{new Date(listing.availableFrom).toLocaleDateString()}</p>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg">
+            {/* <div className="bg-gray-50 p-4 rounded-lg">
               <h3 className="font-semibold text-gray-600">Max Occupants</h3>
               <p>{listing.rules?.maxOccupants}</p>
-            </div>
+            </div> */}
           </div>
 
           <div className="mb-6">
@@ -318,7 +319,7 @@ export default function ListingDetailPage() {
             </div>
           </div>
 
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <h2 className="text-xl font-semibold mb-2">House Rules</h2>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
@@ -338,7 +339,13 @@ export default function ListingDetailPage() {
                 Smoking allowed
               </li>
             </ul>
-          </div>
+          </div> */}
+            <div className="max-w-4xl mx-auto p-4">
+      {/* Other listing details... */}
+      <HouseRulesDisplay ruleIds={listing.house_rules || []} />
+      {/* Rest of the listing details... */}
+    </div>
+            
 
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-2">Location</h2>
