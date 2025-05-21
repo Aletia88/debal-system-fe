@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Check, Pencil } from 'lucide-react';
-import { useGetProfileQuery, useUpdateWorkMutation } from "@/store/profile";
+import { useGetProfileByIdQuery, useGetProfileQuery, useUpdateWorkMutation } from "@/store/profile";
 import { Modal, Button, Select, Switch } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useParams } from 'next/navigation';
 
 const WorkInfo = () => {
-    const { data: profile } = useGetProfileQuery({});
+    const { data: profileD } = useGetProfileQuery({});
     const [updateWork, { isLoading }] = useUpdateWorkMutation();
     const [modalOpened, setModalOpened] = useState(false);
     const {id} = useParams()
+     const {data} = useGetProfileByIdQuery(id)
+        
+            const profile = id ? data : profileD
 
-    const isCurrentUserProfile = id ?  profile?.user._id === id : true;
+    const isCurrentUserProfile = id ?  profileD?.user._id === id : true;
 
     const form = useForm({
         initialValues: {
