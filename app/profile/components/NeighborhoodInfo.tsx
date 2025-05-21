@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Check, Pencil } from 'lucide-react';
-import { useGetProfileQuery, useUpdateNeighborhoodMutation } from "@/store/profile";
+import { useGetProfileByIdQuery, useGetProfileQuery, useUpdateNeighborhoodMutation } from "@/store/profile";
 import { Modal, Button, Select, NumberInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useParams } from 'next/navigation';
 
 const NeighborhoodInfo = () => {
-    const { data: profile } = useGetProfileQuery({});
+    const { data: profileD } = useGetProfileQuery({});
     const [updateNeighborhood, { isLoading }] = useUpdateNeighborhoodMutation();
     const [modalOpened, setModalOpened] = useState(false);
 
     const {id} = useParams()
+     const {data} = useGetProfileByIdQuery(id)
+        
+            const profile = id ? data : profileD
 
-    const isCurrentUserProfile = id ?  profile?.user._id === id : true;
+    const isCurrentUserProfile = id ?  profileD?.user._id === id : true;
 
     const form = useForm({
         initialValues: {
