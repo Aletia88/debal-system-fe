@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { Twitter, Facebook, Instagram, Check, Pencil, X, ChevronLeft, ChevronRight, Upload, Trash2 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -19,10 +19,11 @@ import HobbiesInfo from "./components/Hobbies"
 import FinancialInfo from "./components/FinancialInfo"
 import PetsInfo from "./components/Pets"
 import SharedLivingInfo from "./components/SharedLivingInfo"
-import { useGetProfileQuery, useRemoveProfilePhotoMutation, useSetProfilePhotoMutation, useUpdateProfilePhotoMutation } from "@/store/profile"
+import { useGetProfileQuery, useGetProviderProfileByIdQuery, useGetProviderProfileQuery, useRemoveProfilePhotoMutation, useSetProfilePhotoMutation, useUpdateProfilePhotoMutation } from "@/store/profile"
 import { useToast } from "@/hooks/use-toast"
 import Image from "next/image"
 import { useDisclosure } from "@mantine/hooks"
+import ProfileInfo from "./components/ProviderInfo"
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
 export default function ProfilePage() {
@@ -32,6 +33,9 @@ export default function ProfilePage() {
   const [updateProfilePhoto] = useUpdateProfilePhotoMutation()
   const { toast } = useToast()
   const [photoToDelete, setPhotoToDelete] = useState<string | null>(null);
+  // const {data: provider} = useGetProviderProfileByIdQuery(profile.user._id)
+  const {data: providers} = useGetProviderProfileQuery({})
+  const [userRole, setUserRole] = useState<'user' | 'houseprovider' | null>(null);
 
   // State for image gallery
   const [selectedImageIndex, setSelectedImageIndex] = useState(null)
@@ -43,6 +47,13 @@ export default function ProfilePage() {
   // console.log(`${baseUrl}${profilePhoto?.url}`)
 
   const [removeProfilePhoto] = useRemoveProfilePhotoMutation();
+
+  useEffect(() => {
+    // Check if we have profile data and determine the role
+    if (profile?.user.role) {
+      setUserRole(profile.user.role);
+    }
+  }, [profile]);
 
   const handleDeleteClick = (filename: string) => {
     setPhotoToDelete(filename);
@@ -286,10 +297,14 @@ export default function ProfilePage() {
           </div>
         )}
         {/* Profile Content Sections */}
+        {userRole == 'houseprovider' ? 
+         <SimpleGrid cols={{ base: 1, sm: 2,  }}>
+        <ProfileInfo /> 
+        </SimpleGrid>:
         <SimpleGrid cols={{ base: 1, sm: 2,  }}>
           <Stack><PersonalInfo /><NeighborhoodInfo /> <WorkInfo /> <HobbiesInfo /> <PetsInfo /></Stack>
           <Stack><LifestyleInfo /> <FoodInfo /> <FinancialInfo /> <SharedLivingInfo /></Stack>
-        </SimpleGrid>
+        </SimpleGrid>}
         <Modal
           opened={opened}
           onClose={close}

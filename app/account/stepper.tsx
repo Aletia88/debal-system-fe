@@ -32,12 +32,12 @@ export default function Form() {
   }, [profileData]);
 
   const handleStepChange = (nextStep: number) => {
-    if (nextStep > (userRole === 'houseprovider' ? 2 : 10) || nextStep < 0) return;
+    if (nextStep > (userRole === 'houseprovider' ? 1 : 10) || nextStep < 0) return;
     setActive(nextStep);
     setHighestStepVisited((hSC) => Math.max(hSC, nextStep));
   };
   const handleHpStepChange = (nextStep: number) => {
-    if (nextStep > (userRole === 'houseprovider' ? 2 : 10) || nextStep < 0) return;
+    if (nextStep > (userRole === 'houseprovider' ? 1 : 10) || nextStep < 0) return;
     setActiveHp(nextStep);
     setHighestStepVisited((hSC) => Math.max(hSC, nextStep));
   };
@@ -58,12 +58,12 @@ export default function Form() {
     <Flex gap="xl" align="flex-start" className='p-5' pos="relative">
       <LoadingOverlay visible={isSubmitting} />
       
-      {/* Vertical stepper - different for house providers */}
+      {/* Vertical stepper - different for house houseproviders */}
       {userRole === 'houseprovider' ? (
         <Box>
           <Stepper active={active} onStepClick={setActive} orientation="vertical" className='pr-5'>
             <Stepper.Step label="Provider Information" allowStepSelect={shouldAllowSelectHpStep(0)} />
-            <Stepper.Step label="Complete" allowStepSelect={shouldAllowSelectHpStep(1)} />
+            {/* <Stepper.Step label="Complete" allowStepSelect={shouldAllowSelectHpStep(1)} /> */}
           </Stepper>
         </Box>
       ) : (
@@ -88,18 +88,18 @@ export default function Form() {
       <Box style={{ flex: 1 }} bg='white' p={20} className='border-t-4 border-t-violet-600 '>
         {userRole === 'houseprovider' ? (
           <>
-            {active === 0 && (
+            {activeHp === 0 && (
               <ProviderInfo 
                 onNext={() => handleHpStepChange(1)} 
-                initialData={profileData?.providerInfo}
+                initialData={profileData?.houseproviderInfo}
               />
             )}
-            {active === 1 && (
+            {/* {active === 1 && (
               <CompleteMessage 
                 onBack={() => handleHpStepChange(0)}
                 isProvider={true}
               />
-            )}
+            )} */}
           </>
         ) : (
           <>

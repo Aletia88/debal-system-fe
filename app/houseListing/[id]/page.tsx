@@ -1,5 +1,5 @@
 'use client'
-import { useGetHouseListingQuery, useDeleteListingMutation, useUploadListingImagesMutation, useDeleteListingImageMutation } from '@/store/houseListing';
+import { useGetHouseListingQuery, useDeleteListingMutation, useUploadListingImagesMutation, useDeleteListingImageMutation, useGetHouseRulesQuery } from '@/store/houseListing';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Image from 'next/image';
@@ -26,6 +26,7 @@ export default function ListingDetailPage() {
   const [uploadImages] = useUploadListingImagesMutation();
   const [deleteImage] = useDeleteListingImageMutation();
   const { data: profile } = useGetProfileQuery({});
+  const {data: rules} = useGetHouseRulesQuery({})
 
   const isMyListing = listing?.user_id === profile?.user._id;
 

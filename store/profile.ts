@@ -36,6 +36,14 @@ export const ProfileApi = createApi({
             query: (id) =>`/profiles/user/${id}`,
             providesTags: ["profiles"],
         }),
+        getProviderProfile: builder.query({
+            query: () =>`/providers/profile/`,
+            providesTags: ["profiles"],
+        }),
+        getProviderProfileById: builder.query({
+            query: (id) =>`/providers/profile/${id}`,
+            providesTags: ["profiles"],
+        }),
         getProfileByRecommendation: builder.query({
             query: () =>`/profiles/recommendations`,
             providesTags: ["profiles"],
@@ -45,6 +53,14 @@ export const ProfileApi = createApi({
         updatePersonalInfo: builder.mutation({
             query: (data) => ({
                 url: "/profiles/personal-info",
+                method: "POST",
+                body: data
+            }),
+            invalidatesTags: ["profiles"],
+        }),
+        updateProviderInfo: builder.mutation({
+            query: (data) => ({
+                url: "/providers/register",
                 method: "POST",
                 body: data
             }),
@@ -190,5 +206,8 @@ export const {
     useSetProfilePhotoMutation,
     useRemoveProfilePhotoMutation,
     useGetProfileByIdQuery,
-    useGetProfileByRecommendationQuery
+    useGetProfileByRecommendationQuery,
+    useGetProviderProfileByIdQuery,
+    useGetProviderProfileQuery,
+    useUpdateProviderInfoMutation
 } = ProfileApi;

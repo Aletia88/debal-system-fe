@@ -1,10 +1,10 @@
 'use client'
 import { useForm } from '@mantine/form';
-import { useMutation } from '@tanstack/react-query';
-import { Button, TextInput, Textarea, NumberInput, Select, Checkbox, MultiSelect, FileInput, Group, Stack, Paper, Title, Text } from '@mantine/core';
+// import { useMutation } from '@tanstack/react-query';
+import { Button, TextInput, Textarea, NumberInput, Select, Checkbox, MultiSelect,Badge, FileInput, Group, Stack, Paper, Title, Text } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { useRouter } from 'next/navigation';
-import { useCreateListingMutation } from '@/store/houseListing';
+import { useCreateListingMutation, useGetHouseRulesQuery } from '@/store/houseListing';
 import { useState } from 'react';
 import { notifications } from '@mantine/notifications';
 
@@ -27,6 +27,8 @@ export default function CreateListingPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [createListing, { isLoading }] = useCreateListingMutation();
   const token = localStorage.getItem("token");
+   const { data: houseRules, isLoading: isRulesLoading } = useGetHouseRulesQuery({});
+ 
   const form = useForm({
     initialValues: {
       title: '',
@@ -44,11 +46,8 @@ export default function CreateListingPage() {
         state: '',
         zipCode: '',
       },
-      rules: {
-        petsAllowed: false,
-        smokingAllowed: false,
-        maxOccupants: 1,
-      },
+      house_rules: [] as string[],
+       
       amenities: [] as string[],
       availableFrom: new Date(),
     },
@@ -89,11 +88,8 @@ export default function CreateListingPage() {
         },
         amenities: values.amenities,
         availableFrom: values.availableFrom.toISOString().split('T')[0], // YYYY-MM-DD format
-        rules: {
-          noSmoking: !values.rules.smokingAllowed, // Note the inversion here
-          noPets: !values.rules.petsAllowed        // Note the inversion here
-        },
-        house_rules: "682b1ad47bf7700c34fedb43", // Add this field to your form if needed
+        house_rules: values.house_rules 
+        // house_rules: "682b1ad47bf7700c34fedb43", // Add this field to your form if needed
 
        
       };
@@ -113,7 +109,7 @@ export default function CreateListingPage() {
       }
   
       const result = await response.json();
-      router.push(`/houseListing/${result._id}`);
+      router.push(`/houseListing/${result.listing._id}`);
     } catch (error) {
       console.error('Submission error:', error);
       notifications.show({
@@ -124,11 +120,16 @@ export default function CreateListingPage() {
     }
   };
   
+  const activeRules = houseRules?.filter((house_rules:any) => house_rules.isActive) || [];
+  const rulesOptions = activeRules?.map((house_rules:any) => ({
+    value: house_rules._id,
+    label: house_rules.name,
+  }));
   // Helper function to upload images
  
 
   return (
-    <Paper p="xl" shadow="sm" radius="md" maw={1200} mx="auto">
+    <Paper p="xl" shadow="sm" radius="md" maw={1200} mx="auto" mt={20}>
       <Title order={1} mb="xl">Create New Listing</Title>
       
       <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -242,23 +243,20 @@ export default function CreateListingPage() {
 
           {/* House Rules */}
           <Paper p="md" withBorder>
-            <Title order={2} mb="md">House Rules</Title>
-            <Group grow>
-              <Checkbox
-                label="Pets Allowed"
-                {...form.getInputProps('rules.petsAllowed', { type: 'checkbox' })}
-              />
-              <Checkbox
-                label="Smoking Allowed"
-                {...form.getInputProps('rules.smokingAllowed', { type: 'checkbox' })}
-              />
-              <NumberInput
-                label="Max Occupants"
-                min={1}
-                {...form.getInputProps('rules.maxOccupants')}
-                required
-              />
-            </Group>
+          <Title order={4} mb="sm">House Rules</Title>
+              {activeRules.length > 0 ? (
+                <MultiSelect
+                  label="Select applicable rules"
+                  placeholder="Choose house rules"
+                  data={rulesOptions}
+                  {...form.getInputProps('house_rules')}
+                  searchable
+                  clearable
+                />
+              ) : (
+                <Badge color="yellow" variant="light">No active house rules available</Badge>
+              )}
+
           </Paper>
 
           {/* Amenities */}

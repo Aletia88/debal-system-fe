@@ -13,6 +13,7 @@ export default function MyListings() {
   return (
     <>
       <Group justify='end'>
+        <Button onClick={()=>router.push('./houseListing/rules')}>House Rules</Button>
         <Button onClick={()=>router.push('./houseListing/new')}>Add New</Button>
       </Group>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">

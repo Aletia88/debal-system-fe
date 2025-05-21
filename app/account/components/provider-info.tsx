@@ -1,11 +1,13 @@
 // components/provider-Info.tsx
 import { TextInput, Button, Stack, Notification } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function ProviderInfo({ onNext, initialData }: { onNext: () => void, initialData?: any }) {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter()
 
   const form = useForm({
     initialValues: {
@@ -40,7 +42,7 @@ export default function ProviderInfo({ onNext, initialData }: { onNext: () => vo
         throw new Error(errorData.message || 'Registration failed');
       }
 
-      onNext();
+      router.push('/profile')
     } catch (err: any) {
       setError(err.message);
     } finally {

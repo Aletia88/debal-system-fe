@@ -62,7 +62,7 @@ export default function SignUpPage() {
             user: data.user,
           })
         );
-        router.push("/");
+        router.push("/verification");
       } else {
         const errorText = await res.text();
         try {

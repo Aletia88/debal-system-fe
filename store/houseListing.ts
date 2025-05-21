@@ -42,6 +42,13 @@ export const HouseApi = createApi({
           body:  formData 
         }),
       }),
+      createRules: builder.mutation({
+        query: (formData: FormData) => ({
+          url: "/house-rules",
+          method: "POST",
+          body:  formData 
+        }),
+      }),
       getList: builder.query({
         query: () => `/list`,
         providesTags: ["listing"]
@@ -50,8 +57,16 @@ export const HouseApi = createApi({
         query: () => `/list/all/get`,
         providesTags: ["listing"]
       }),
+      getHouseRules: builder.query({
+        query: () => `/house-rules `,
+        providesTags: ["listing"]
+      }),
       getHouseListing: builder.query({
         query: (id) => `/list/${id}`,
+        providesTags: ["listing"]
+      }),
+      getHouseRuleById: builder.query({
+        query: (id) => `/house-rules/${id}`,
         providesTags: ["listing"]
       }),
       getFilteredListings: builder.query({
@@ -97,6 +112,14 @@ export const HouseApi = createApi({
         }),
         invalidatesTags: ['listing'],
       }),
+      updateRule: builder.mutation({
+        query: ({ id, data }) => ({
+          url: `house-rules/${id}`,
+          method: 'PUT',
+          body: data,
+        }),
+        invalidatesTags: ['listing'],
+      }),
       uploadListingImages: builder.mutation({
         query: ({ id, images }) => ({
           url: `listings/${id}/images`,
@@ -129,6 +152,11 @@ useGetFilteredListingsQuery,
 useDeleteListingMutation,
 useUpdateListingMutation,
 useUploadListingImagesMutation,
-useDeleteListingImageMutation
+useDeleteListingImageMutation,
+useGetHouseRulesQuery,
+useCreateRulesMutation,
+useGetHouseRuleByIdQuery,
+useLazyGetAllListQuery,
+useUpdateRuleMutation
 
 }= HouseApi
