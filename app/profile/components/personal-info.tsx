@@ -1,18 +1,20 @@
 'use client'
 import { useState, useEffect } from 'react';
 import { Check, Pencil } from 'lucide-react';
-import { useGetProfileQuery, useUpdatePersonalInfoMutation } from "@/store/profile";
+import { useGetProfileByIdQuery, useGetProfileQuery, useUpdatePersonalInfoMutation } from "@/store/profile";
 import { Modal, Button, TextInput, Select, Radio, Textarea, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useParams } from 'next/navigation';
 
 const PersonalInfo = () => {
-    const { data: profile } = useGetProfileQuery({});
+    const { data: profileD } = useGetProfileQuery({});
     const [updatePersonalInfo, { isLoading }] = useUpdatePersonalInfoMutation();
     const [modalOpened, setModalOpened] = useState(false);
     const {id} = useParams()
-
-    const isCurrentUserProfile = id ?  profile?.user._id === id : true;
+     const {data} = useGetProfileByIdQuery(id)
+    
+        const profile = id ? data : profileD
+    const isCurrentUserProfile = id ?  profileD?.user._id === id : true;
 
     const form = useForm({
         initialValues: {
