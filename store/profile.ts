@@ -32,6 +32,10 @@ export const ProfileApi = createApi({
             query: () => "/profiles/me",
             providesTags: ["profiles"],
         }),
+        getRecommendation: builder.query({
+            query: () => "/matches/recommendations",
+            providesTags: ["profiles"],
+        }),
         getProfileById: builder.query({
             query: (id) =>`/profiles/user/${id}`,
             providesTags: ["profiles"],
@@ -209,5 +213,6 @@ export const {
     useGetProfileByRecommendationQuery,
     useGetProviderProfileByIdQuery,
     useGetProviderProfileQuery,
-    useUpdateProviderInfoMutation
+    useUpdateProviderInfoMutation,
+    useGetRecommendationQuery
 } = ProfileApi;

@@ -8,7 +8,7 @@ import { ChatWindow } from '@/components/Chat/ChatWindow';
 import { useChat } from '@/hooks/useChat';
 import { Chat } from '@/types/chat';
 import FilterSidebar from '@/components/filter-sidebar';
-import { useGetProfileByRecommendationQuery } from '@/store/profile';
+import { useGetRecommendationQuery } from '@/store/profile';
 
 const matches = [
   { id: 1, name: "Rebecca Oyebanji", matchPercentage: 80, image: "/image.png" },
@@ -32,7 +32,7 @@ export default function MatchesPage() {
   const [activeChat, setActiveChat] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showFilter, setShowFilter] = useState(false); // Changed to false by default
-  const {data:recommendation} = useGetProfileByRecommendationQuery({})
+  const {data:recommendation} = useGetRecommendationQuery({})
 
   const handleMessageClick = (userId: number) => {
     setActiveChat(userId);
