@@ -25,7 +25,7 @@ const ProfileDetail = () => {
     const [selectedImageIndex, setSelectedImageIndex] = useState(null)
     const [isViewerOpen, setIsViewerOpen] = useState(false)
     const [userRole, setUserRole] = useState<'user' | 'houseprovider' | null>(null);
-
+console.log(profile)
     useEffect(() => {
         // Check if we have profile data and determine the role
         if (profile?.user.role) {

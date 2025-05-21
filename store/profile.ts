@@ -173,6 +173,14 @@ export const ProfileApi = createApi({
               }),
             invalidatesTags: ["profiles"],
           }),
+          RegisterProvider: builder.mutation({
+            query: (formData) => ({
+                url: "/providers/register",
+                method: "POST",
+                body: formData,
+              }),
+            invalidatesTags: ["profiles"],
+          }),
           setProfilePhoto: builder.mutation<void, string>({
             query: (filename) => ({
               url: `/profiles/profile/photo/set-profile/${filename}`,
@@ -214,5 +222,6 @@ export const {
     useGetProviderProfileByIdQuery,
     useGetProviderProfileQuery,
     useUpdateProviderInfoMutation,
-    useGetRecommendationQuery
+    useGetRecommendationQuery,
+    useRegisterProviderMutation
 } = ProfileApi;

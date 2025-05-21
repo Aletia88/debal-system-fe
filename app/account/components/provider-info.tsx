@@ -1,13 +1,19 @@
 // components/provider-Info.tsx
+'use client'
 import { TextInput, Button, Stack, Notification } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+// Assuming you have or will create this hook
+import { useRegisterProviderMutation } from '@/store/profile';
+
 export default function ProviderInfo({ onNext, initialData }: { onNext: () => void, initialData?: any }) {
   const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
+  
+  // Using the mutation hook
+  const [registerProvider] = useRegisterProviderMutation();
 
   const form = useForm({
     initialValues: {
@@ -21,34 +27,17 @@ export default function ProviderInfo({ onNext, initialData }: { onNext: () => vo
       contactPhone: (value) => value.trim().length < 6 ? 'Valid phone number is required' : null,
     },
   });
-
+  
   const handleSubmit = async (values: any) => {
-    setIsSubmitting(true);
-    setError('');
-    const token = localStorage.getItem('token'); 
     try {
-      const response = await fetch('https://debal-api.onrender.com/api/providers/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify(values),
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Registration failed');
-      }
-
-      router.push('/profile')
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsSubmitting(false);
+      await registerProvider(values).unwrap();
+      router.push('/profile');
+    } catch (error) {
+      console.error('Failed to save shared living preferences:', error);
     }
   };
+
+ 
 
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -82,7 +71,7 @@ export default function ProviderInfo({ onNext, initialData }: { onNext: () => vo
 
         <Button
           type="submit"
-          loading={isSubmitting}
+          // loading={registerProviderMutation.isPending}
           fullWidth
           mt="md"
         >

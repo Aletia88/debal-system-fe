@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Check, Pencil } from 'lucide-react';
-import { useGetProfileByIdQuery, useGetProviderProfileQuery, useUpdateProviderInfoMutation } from "@/store/profile";
+import { useGetProfileByIdQuery, useGetProviderProfileByIdQuery, useGetProviderProfileQuery, useUpdateProviderInfoMutation } from "@/store/profile";
 import { Modal, Button, Select, Switch, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useParams } from 'next/navigation';
@@ -10,7 +10,7 @@ const ProfileInfo = () => {
     const [updateProfile, { isLoading }] = useUpdateProviderInfoMutation();
     const [modalOpened, setModalOpened] = useState(false);
     const { id } = useParams()
-     const {data} = useGetProfileByIdQuery(id)
+     const {data} = useGetProviderProfileByIdQuery(id)
         
             const profile = id ? data : profileD
 
@@ -71,7 +71,7 @@ const ProfileInfo = () => {
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <h4 className="font-medium capitalize">{profile?.companyName || 'Not specified'}</h4>
+                            <h4 className="font-medium capitalize">{profileD?.companyName || 'Not specified'}</h4>
                             <p className="text-sm text-gray-500">Company Name</p>
                         </div>
                         <div>
