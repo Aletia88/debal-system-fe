@@ -96,13 +96,16 @@ export default function SignUpPage() {
               overflow: 'hidden'
             }}>
               <Image
-                src="/room.jpg"
+                src="/room.png"
                 alt="People socializing"
-               
-                style={{ objectFit: 'cover' }}
+                style={{
+                  objectFit: 'cover',
+                  objectPosition: 'center center', // This ensures the center of the image is shown
+                  width: '100%',
+                  height: '100%'
+                }}
               />
             </div>
-
             <Paper withBorder shadow="sm" p={30} radius="md" style={{ maxWidth: rem(500) }}>
               <Group justify="flex-end" mb="sm">
                 <Text size="sm" c="dimmed">
@@ -138,21 +141,21 @@ export default function SignUpPage() {
                 <Divider label="OR" labelPosition="center" my="lg" />
 
                 <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-                <Stack>
-            <TextInput
-              label="User Name"
-              placeholder="Type Your email"
-              {...form.getInputProps("email")}
-              required
-            />
+                  <Stack>
+                    <TextInput
+                      label="User Name"
+                      placeholder="Type Your email"
+                      {...form.getInputProps("email")}
+                      required
+                    />
 
-            <PasswordInput
-              label="Password"
-              placeholder="Type Your Password"
-              {...form.getInputProps("password")}
-              required
-            />
-                  {/* <Checkbox
+                    <PasswordInput
+                      label="Password"
+                      placeholder="Type Your Password"
+                      {...form.getInputProps("password")}
+                      required
+                    />
+                    {/* <Checkbox
                     label={
                       <Text size="sm">
                         I agree to the{" "}
@@ -166,17 +169,17 @@ export default function SignUpPage() {
                       </Text>
                     }
                   /> */}
-                  <Button 
-                  type="submit"
-                    color="violet" 
-                    radius="md" 
-                    size="md"
-                    fullWidth
-                  >
-                    Sign In
-                  </Button>
-                </Stack>
-                  </form>
+                    <Button
+                      type="submit"
+                      color="violet"
+                      radius="md"
+                      size="md"
+                      fullWidth
+                    >
+                      Sign In
+                    </Button>
+                  </Stack>
+                </form>
               </Stack>
             </Paper>
           </div>

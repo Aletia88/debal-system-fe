@@ -20,17 +20,17 @@ export default function SignUpPage() {
       name: "",
       email: "",
       password: "",
-      role: 'user' 
+      role: 'user'
     },
     validate: {
       name: (value) => (value.trim().length < 2 ? "Name must be at least 2 characters" : null),
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
       password: (value) => (
-        value.length < 6 ? "Password must be at least 6 characters" : 
-        !/[A-Z]/.test(value) ? "Password must contain at least one uppercase letter" :
-        !/[a-z]/.test(value) ? "Password must contain at least one lowercase letter" :
-        !/[0-9]/.test(value) ? "Password must contain at least one number" :
-        null
+        value.length < 6 ? "Password must be at least 6 characters" :
+          !/[A-Z]/.test(value) ? "Password must contain at least one uppercase letter" :
+            !/[a-z]/.test(value) ? "Password must contain at least one lowercase letter" :
+              !/[0-9]/.test(value) ? "Password must contain at least one number" :
+                null
       ),
     },
   });
@@ -100,17 +100,22 @@ export default function SignUpPage() {
               overflow: 'hidden'
             }}>
               <Image
-                src="/room.jpg"
+                src="/room.png"
                 alt="People socializing"
-                style={{ objectFit: 'cover' }}
+                style={{
+                  objectFit: 'cover',
+                  objectPosition: 'center center', // This ensures the center of the image is shown
+                  width: '100%',
+                  height: '100%'
+                }}
               />
             </div>
 
             <Paper withBorder shadow="sm" p={30} radius="md" style={{ maxWidth: rem(500) }}>
               {showError && (
-                <Notification 
-                  icon={<IconX size="1.1rem" />} 
-                  color="red" 
+                <Notification
+                  icon={<IconX size="1.1rem" />}
+                  color="red"
                   title="Error"
                   onClose={() => setShowError(false)}
                   mb="md"
@@ -199,10 +204,10 @@ export default function SignUpPage() {
                       required
                     /> */}
 
-                    <Button 
+                    <Button
                       type="submit"
-                      color="violet" 
-                      radius="md" 
+                      color="violet"
+                      radius="md"
                       size="md"
                       fullWidth
                       loading={loading}
