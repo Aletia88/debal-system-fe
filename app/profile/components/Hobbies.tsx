@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Check, Pencil } from 'lucide-react';
-import { useGetProfileQuery, useUpdateHobbiesMutation } from "@/store/profile";
+import { useGetProfileByIdQuery, useGetProfileQuery, useUpdateHobbiesMutation } from "@/store/profile";
 import { Modal, Button, MultiSelect } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useParams } from 'next/navigation';
 
 const HobbiesInfo = () => {
-    const { data: profile } = useGetProfileQuery({});
+    const { data: profileD } = useGetProfileQuery({});
     const [updateHobbies, { isLoading }] = useUpdateHobbiesMutation();
     const [modalOpened, setModalOpened] = useState(false);
 
     const {id} = useParams()
+     const {data} = useGetProfileByIdQuery(id)
+        
+            const profile = id ? data : profileD
 
-    const isCurrentUserProfile = id ?  profile?.user._id === id : true;
+    const isCurrentUserProfile = id ?  profileD?.user._id === id : true;
 
     const hobbiesOptions = ['reading', 'sports', 'travelling', 'music', 'movies', 'gaming', 'cooking', 'art','board games'];
 
