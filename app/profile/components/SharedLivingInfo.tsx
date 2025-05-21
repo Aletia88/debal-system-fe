@@ -1,17 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Check, Pencil } from 'lucide-react';
-import { useGetProfileQuery, useUpdateSharedLivingMutation } from "@/store/profile";
+import { useGetProfileByIdQuery, useGetProfileQuery, useUpdateSharedLivingMutation } from "@/store/profile";
 import { Modal, Button, Select, Radio, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useParams } from 'next/navigation';
 
 const SharedLivingInfo = () => {
-    const { data: profile } = useGetProfileQuery({});
+    const { data: profileD } = useGetProfileQuery({});
     const [updateSharedLiving, { isLoading }] = useUpdateSharedLivingMutation();
     const [modalOpened, setModalOpened] = useState(false);
     const {id} = useParams()
+     const {data} = useGetProfileByIdQuery(id)
+        
+            const profile = id ? data : profileD
 
-    const isCurrentUserProfile = id ?  profile?.user._id === id : true;
+    
+
+    const isCurrentUserProfile = id ?  profileD?.user._id === id : true;
 
     const form = useForm({
         initialValues: {
