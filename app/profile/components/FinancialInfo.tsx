@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Check, Pencil } from 'lucide-react';
-import { useGetProfileQuery, useUpdateFinancialMutation } from "@/store/profile";
+import { useGetProfileByIdQuery, useGetProfileQuery, useUpdateFinancialMutation } from "@/store/profile";
 import { Modal, Button, Select, NumberInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useParams } from 'next/navigation';
 
 const FinancialInfo = () => {
-    const { data: profile } = useGetProfileQuery({});
+    const { data: profileD } = useGetProfileQuery({});
     const [updateFinancial, { isLoading }] = useUpdateFinancialMutation();
     const [modalOpened, setModalOpened] = useState(false);
-
+    
     const {id} = useParams()
+    const {data} = useGetProfileByIdQuery(id)
 
-    const isCurrentUserProfile = id ?  profile?.user._id === id : true;
+    const profile = id ? data : profileD
+
+    const isCurrentUserProfile = id ?  profileD?.user._id === id : true;
 
     const incomeLevels = [
         'Under 30,000',
