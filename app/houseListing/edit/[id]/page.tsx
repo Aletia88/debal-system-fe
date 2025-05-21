@@ -4,7 +4,7 @@ import { useGetHouseListingQuery, useUpdateListingMutation,useGetHouseRulesQuery
 import { useParams, useRouter } from 'next/navigation';
 import { useForm } from '@mantine/form';
 import { Button, TextInput, Textarea, NumberInput, Select, Checkbox, MultiSelect, Group, Stack, LoadingOverlay, Alert, Card, Title, Divider, Flex, Badge, Container } from '@mantine/core';
-import { DatePicker } from '@mantine/dates';
+import { DateInput, DatePicker } from '@mantine/dates';
 import { useEffect, useState } from 'react';
 import { notifications } from '@mantine/notifications';
 import { IconAlertCircle, IconCheck, IconHomeEdit } from '@tabler/icons-react';
@@ -87,7 +87,7 @@ export default function EditListingPage() {
           state: listing.address.state,
           zipCode: listing.address.zipCode,
         },
-        house_rules: listing.house_rules?.map(rule => rule._id) || [], // Extract just the IDs
+        house_rules: listing.house_rules?.map((rule:any) => rule._id) || [], // Extract just the IDs
         amenities: listing.amenities || [],
         availableFrom: new Date(listing.availableFrom),
         status: listing.status || 'available',
@@ -297,11 +297,11 @@ export default function EditListingPage() {
             {/* Availability Section */}
             <Card withBorder padding="lg" radius="md">
               <Title order={3} mb="sm">Availability</Title>
-              <DatePicker
-                // label="Available From"
+              <DateInput
+                label="Available From"
                 placeholder="Select availability date"
                 {...form.getInputProps('availableFrom')}
-                // required
+                required
               />
             </Card>
 

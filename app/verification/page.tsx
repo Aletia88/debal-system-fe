@@ -22,9 +22,9 @@ import { useRouter } from 'next/navigation';
 
 const VerificationPage = () => {
   const [frontImage, setFrontImage] = useState<File | null>(null);
+  const [frontPreview, setFrontPreview] = useState<string | null>(null);
   const [backImage, setBackImage] = useState<File | null>(null);
-  const [frontPreview, setFrontPreview] = useState('');
-  const [backPreview, setBackPreview] = useState('');
+  const [backPreview, setBackPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -43,14 +43,26 @@ const VerificationPage = () => {
     },
   });
 
-  const handleFrontImageUpload = (file: File) => {
-    setFrontImage(file);
-    setFrontPreview(URL.createObjectURL(file));
+  const handleFrontImageUpload = (file: File | null) => {
+    if (file) {
+      setFrontImage(file);
+      setFrontPreview(URL.createObjectURL(file));
+    } else {
+      // Handle the case when file is null (e.g., when user clears the selection)
+      setFrontImage(null);
+      setFrontPreview(null);
+    }
   };
-
-  const handleBackImageUpload = (file: File) => {
-    setBackImage(file);
-    setBackPreview(URL.createObjectURL(file));
+  
+  const handleBackImageUpload = (file: File | null) => {
+    if (file) {
+      setBackImage(file);
+      setBackPreview(URL.createObjectURL(file));
+    } else {
+      // Handle the case when file is null
+      setBackImage(null);
+      setBackPreview(null);
+    }
   };
 
   const handleSubmit = async () => {
@@ -93,7 +105,7 @@ const VerificationPage = () => {
   return (
     <Container size="md" py="xl">
       <Card shadow="sm" padding="lg" radius="md" withBorder>
-        <LoadingOverlay visible={isLoading} overlayBlur={2} />
+        <LoadingOverlay visible={isLoading}  />
 
         {success ? (
           <Box ta="center">
@@ -152,7 +164,7 @@ const VerificationPage = () => {
             <FileInput
               label="Front of ID"
               placeholder="Upload front image"
-              icon={<IconUpload size={14} />}
+              leftSection={<IconUpload size={14} />}
               accept="image/*"
               required
               onChange={handleFrontImageUpload}
@@ -167,7 +179,7 @@ const VerificationPage = () => {
                   alt="Front of ID"
                   height={160}
                   fit="contain"
-                  withPlaceholder
+                  // withPlaceholder
                 />
               </Box>
             )}
@@ -175,7 +187,7 @@ const VerificationPage = () => {
             <FileInput
               label="Back of ID (Optional)"
               placeholder="Upload back image"
-              icon={<IconUpload size={14} />}
+              leftSection={<IconUpload size={14} />}
               accept="image/*"
               onChange={handleBackImageUpload}
               mb="md"
@@ -189,7 +201,7 @@ const VerificationPage = () => {
                   alt="Back of ID"
                   height={160}
                   fit="contain"
-                  withPlaceholder
+                  // withPlaceholder
                 />
               </Box>
             )}
@@ -200,8 +212,8 @@ const VerificationPage = () => {
               </Alert>
             )}
 
-            <Group position="right" mt="xl">
-              <Button type="submit" leftIcon={<IconCheck size={16} />}>
+            <Group justify="right" mt="xl">
+              <Button type="submit" leftSection={<IconCheck size={16} />}>
                 Submit Verification
               </Button>
             </Group>

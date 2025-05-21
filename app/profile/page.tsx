@@ -38,12 +38,12 @@ export default function ProfilePage() {
   const [userRole, setUserRole] = useState<'user' | 'houseprovider' | null>(null);
 
   // State for image gallery
-  const [selectedImageIndex, setSelectedImageIndex] = useState(null)
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0); // Initialize with 0 or another valid index
   const [isViewerOpen, setIsViewerOpen] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const [opened, { open, close }] = useDisclosure(false);
 
-  const profilePhoto = profile?.photos?.find(photo => photo.isProfile);
+  const profilePhoto = profile?.photos?.find((photo:any) => photo.isProfile);
   // console.log(`${baseUrl}${profilePhoto?.url}`)
 
   const [removeProfilePhoto] = useRemoveProfilePhotoMutation();
@@ -69,7 +69,7 @@ export default function ProfilePage() {
         title: "Success",
         description: "Photo deleted successfully",
       });
-    } catch (error) {
+    } catch (error:any) {
       toast({
         title: "Failed to delete photo",
         description: error.message || "Please try again",
@@ -88,7 +88,7 @@ export default function ProfilePage() {
         description: "Profile photo updated successfully",
       });
       setIsViewerOpen(false);
-    } catch (error) {
+    } catch (error:any) {
       toast({
         title: "Failed to update profile photo",
         description: error.message || "Please try again",
@@ -120,7 +120,7 @@ export default function ProfilePage() {
         description: "Photos uploaded successfully",
       })
       setFiles([])
-    } catch (error) {
+    } catch (error:any) {
       toast({
         title: "Upload failed",
         description: error.message || "Could not upload photos",
@@ -145,7 +145,7 @@ export default function ProfilePage() {
               alt="Profile"
             />
             <AvatarFallback>
-              {profile?.user.name?.split(' ').map(n => n[0]).join('') || 'RU'}
+              {profile?.user.name?.split(' ').map((n:any) => n[0]).join('') || 'RU'}
             </AvatarFallback>
           </Avatar>
         </div>
@@ -194,7 +194,7 @@ export default function ProfilePage() {
 
           {profile?.photos?.length > 0 ? (
             <div className="flex flex-wrap gap-2 mt-4">
-              {profile.photos.map((photo, index) => (
+              {profile.photos.map((photo:any, index:any) => (
                 <div key={photo.id || index} className="relative group">
                   <Image
                     src={`${baseUrl}${photo.url}`}

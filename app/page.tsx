@@ -88,7 +88,7 @@ export default function MatchesPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Safely render recommendations */}
-            {recommendations?.recommendations?.map((reco) => (
+            {recommendations?.recommendations?.map((reco:any) => (
               <MatchCard 
                 key={reco.user_id}
                 recommendation={reco}

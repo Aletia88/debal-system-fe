@@ -2,7 +2,7 @@
 import { useForm } from '@mantine/form';
 // import { useMutation } from '@tanstack/react-query';
 import { Button, TextInput, Textarea, NumberInput, Select, Checkbox, MultiSelect,Badge, FileInput, Group, Stack, Paper, Title, Text } from '@mantine/core';
-import { DatePicker } from '@mantine/dates';
+import { DateInput } from '@mantine/dates';
 import { useRouter } from 'next/navigation';
 import { useCreateListingMutation, useGetHouseRulesQuery } from '@/store/houseListing';
 import { useState } from 'react';
@@ -73,7 +73,7 @@ export default function CreateListingPage() {
         description: values.description,
         bedrooms: values.bedrooms,
         bathrooms: values.bathrooms,
-        squareFootage: values.squareFootage, // Add this field to your form if needed
+        // squareFootage: values.squareFootage, // Add this field to your form if needed
         address: {
           street: values.address.street,
           city: values.address.city,
@@ -169,10 +169,10 @@ export default function CreateListingPage() {
                 {...form.getInputProps('bathrooms')}
                 required
               />
-              <DatePicker
+              <DateInput
                 label="Available From"
                 {...form.getInputProps('availableFrom')}
-                // required
+                required
               />
             </Group>
           </Paper>

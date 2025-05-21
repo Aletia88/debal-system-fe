@@ -25,7 +25,7 @@ const ProfileDetail = () => {
   const { data: profile } = useGetProfileByIdQuery(id)
   const { data: userProfile } = useGetProfileQuery({})
   const profilePhoto = profile?.photos?.find((photo: any) => photo.isProfile);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(null)
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0); // Initialize with 0 or another valid index
   const [isViewerOpen, setIsViewerOpen] = useState(false)
   const [userRole, setUserRole] = useState<'user' | 'houseprovider' | null>(null);
 

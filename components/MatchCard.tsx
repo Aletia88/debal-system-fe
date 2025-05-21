@@ -1,15 +1,22 @@
 'use client';
 
 import Image from "next/image";
-import { Contact, Contact2, ContactIcon, Eye, Heart, MessageCircle, Phone } from "lucide-react";
+import { Contact2, Eye, Heart, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
+
+interface Photo {
+  url: string;
+  isProfile: boolean;
+  // Add other photo properties if needed
+}
 
 interface RecommendationUser {
   _id: string;
   name: string;
   email: string;
+  photos?: Photo[];
   personalInfo: {
     age: number;
     gender: string;
@@ -41,11 +48,9 @@ interface MatchCardProps {
     gender: string;
     personality_type: string;
     hobbies: string[];
-    // user: {
-      user: RecommendationUser;
-    // };
+    user: RecommendationUser;
   };
-  onMessageClick: (userId: string) => void;
+  onMessageClick?: (userId: string) => void;
   onLikeToggle?: (userId: string, liked: boolean) => void;
 }
 
@@ -53,13 +58,11 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
 export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: MatchCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const router = useRouter()
-  const handleStartChat = (id:any) => {
-    // Navigate to chat page with user ID as query parameter
+  const router = useRouter();
+  
+  const handleStartChat = (id: string) => {
     router.push(`/chat?newChat=${id}`);
   };
-  
-
 
   const toggleLike = () => {
     const newLikedState = !isLiked;
@@ -80,10 +83,7 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
 
   const matchPercentage = Math.round(recommendation.compatibility_score * 100);
   const user = recommendation.user;
-  const profilePhoto = user?.photos?.find((photo:any) => photo.isProfile);
-
-  console.log('user',user)
-  console.log('rec',recommendation)
+  const profilePhoto = user?.photos?.find(photo => photo.isProfile);
 
   return (
     <>
@@ -122,7 +122,7 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
           </button>
         </div>
         <div className="p-4">
-          <h3 className="font-bold text-lg">{user.user.name}</h3>
+          <h3 className="font-bold text-lg">{user.name}</h3>
           <div className="flex justify-between items-center mt-2">
             <div className="flex items-center">
               <div className="text-orange-400 font-bold">{matchPercentage}%</div>
@@ -133,16 +133,19 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
                 className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleStartChat(user.user._id)
+                  handleStartChat(user._id);
                 }}
               >
                 <MessageCircle size={18} />
               </button>
               <button  
                 className="p-2 bg-white border border-gray-300 text-gray-600 rounded-full hover:bg-gray-50"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/profile/${user._id}`);
+                }}
               >
-                <Contact2 onClick={() => router.push(`/profile/${user.user._id}`)} size={18} />
+                <Contact2 size={18} />
               </button>
             </div>
           </div>
@@ -221,15 +224,17 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
                 <button 
                   className="flex-1 flex items-center justify-center gap-2 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700"
                   onClick={() => {
-                    // onMessageClick(user._id);
                     closeModal();
-                    handleStartChat(user.user._id)
+                    handleStartChat(user._id);
                   }}
                 >
                   <MessageCircle size={18} />
                   Message
                 </button>
-                <button onClick={() => router.push(`/profile/${user.user._id}`)} className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50">
+                <button 
+                  onClick={() => router.push(`/profile/${user._id}`)} 
+                  className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50"
+                >
                   <Contact2 size={18} />
                   Profile
                 </button>
