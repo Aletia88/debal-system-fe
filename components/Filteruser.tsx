@@ -13,7 +13,8 @@ interface Photo {
 }
 
 interface RecommendationUser {
-  _id: string;
+  user_id
+: string;
   name: string;
   email: string;
   photos?: Photo[];
@@ -41,9 +42,11 @@ interface RecommendationUser {
 
 interface MatchCardProps {
   recommendation: {
-    user_id: string;
+    useruser_id
+: string;
     compatibility_score: number;
-    cluster_id: number;
+    clusteruser_id
+: number;
     age: number;
     gender: string;
     personality_type: string;
@@ -55,7 +58,7 @@ interface MatchCardProps {
 }
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
-export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: MatchCardProps) => {
+export const FilterUser = ({ recommendation, onMessageClick, onLikeToggle }: MatchCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
@@ -63,12 +66,14 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
   const handleStartChat = (id: string) => {
     router.push(`/chat?newChat=${id}`);
   };
+  console.log('re',recommendation)
 
   const toggleLike = () => {
     const newLikedState = !isLiked;
     setIsLiked(newLikedState);
     if (onLikeToggle) {
-      onLikeToggle(recommendation.user_id, newLikedState);
+      onLikeToggle(recommendation.useruser_id
+, newLikedState);
     }
   };
 
@@ -81,10 +86,9 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
     }
   };
 
-  const matchPercentage = Math.round(recommendation.compatibility_score * 100);
-  const user = recommendation.user;
-  console.log('user',user)
-  const profilePhoto = user?.photos?.find(photo => photo.isProfile);
+  
+  const profilePhoto = recommendation?.photos?.find(photo => photo.isProfile);
+  console.log(profilePhoto)
 
   return (
     <>
@@ -94,8 +98,8 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
       >
         <div className="relative h-48">
           <Image 
-            src="/image.png" 
-            alt={user.name} 
+            src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image.png"}
+            alt={recommendation.name} 
             fill 
             className="object-cover" 
           />
@@ -123,18 +127,16 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
           </button>
         </div>
         <div className="p-4">
-          <h3 className="font-bold text-lg">{user.user.name}</h3>
-          <div className="flex justify-between items-center mt-2">
-            <div className="flex items-center">
-              <div className="text-orange-400 font-bold">{matchPercentage}%</div>
-              <div className="text-xs text-gray-400 ml-1">Match</div>
-            </div>
+          <h3 className="font-bold text-lg">{recommendation.name}</h3>
+          <div className="flex justify-end items-center mt-2">
+          
             <div className="flex space-x-2">
               <button 
                 className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleStartChat(user.user._id);
+                  handleStartChat(recommendation.user_id
+);
                 }}
               >
                 <MessageCircle size={18} />
@@ -143,7 +145,8 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
                 className="p-2 bg-white border border-gray-300 text-gray-600 rounded-full hover:bg-gray-50"
                 onClick={(e) => {
                   e.stopPropagation();
-                  router.push(`/profile/${user.user._id}`);
+                  router.push(`/profile/${recommendation.user_id
+}`);
                 }}
               >
                 <Contact2 size={18} />
@@ -157,19 +160,19 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-md md:max-w-xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl">{user.name}</DialogTitle>
+            <DialogTitle className="text-2xl">{recommendation.name}</DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative h-64 w-full rounded-lg overflow-hidden">
               <Image
                 src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image.png"}
-                alt={user.name}
+                alt={recommendation.name}
                 fill
                 className="object-cover"
               />
             </div>
             <div className="space-y-4">
-              <div className="flex items-center space-x-4">
+              {/* <div className="flex items-center space-x-4">
                 <div className="text-orange-400 font-bold text-xl">
                   {matchPercentage}% Match
                 </div>
@@ -183,33 +186,33 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
                     color={isLiked ? "red" : "currentColor"} 
                   />
                 </button>
-              </div>
+              </div> */}
               
               <div>
                 <h4 className="text-sm text-gray-500">Age</h4>
-                <p className="font-medium">{user.personalInfo.age}</p>
+                <p className="font-medium">{recommendation.age}</p>
               </div>
               
               <div>
                 <h4 className="text-sm text-gray-500">Occupation</h4>
-                <p className="font-medium">{user.personalInfo.occupation}</p>
+                <p className="font-medium">{recommendation.occupation}</p>
               </div>
               
               <div>
-                <h4 className="text-sm text-gray-500">Personality</h4>
-                <p className="font-medium">{user.lifestyle.personality_type}</p>
+                <h4 className="text-sm text-gray-500">Gender</h4>
+                <p className="font-medium">{recommendation.gender}</p>
               </div>
               
               <div>
-                <h4 className="text-sm text-gray-500">Daily Routine</h4>
-                <p className="font-medium">{user.lifestyle.daily_routine}</p>
+                <h4 className="text-sm text-gray-500">Religion</h4>
+                <p className="font-medium">{recommendation.religion}</p>
               </div>
               
-              {recommendation.hobbies.length > 0 && (
+              {recommendation?.hobbies?.length > 0 && (
                 <div>
                   <h4 className="text-sm text-gray-500">Hobbies</h4>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {recommendation.hobbies.map((hobby, index) => (
+                    {recommendation?.hobbies?.map((hobby, index) => (
                       <span 
                         key={index} 
                         className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
@@ -226,14 +229,16 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
                   className="flex-1 flex items-center justify-center gap-2 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700"
                   onClick={() => {
                     closeModal();
-                    handleStartChat(user._id);
+                    handleStartChat(recommendation.user_id
+);
                   }}
                 >
                   <MessageCircle size={18} />
                   Message
                 </button>
                 <button 
-                  onClick={() => router.push(`/profile/${user._id}`)} 
+                  onClick={() => router.push(`/profile/${recommendation.user_id
+}`)} 
                   className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50"
                 >
                   <Contact2 size={18} />

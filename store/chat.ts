@@ -18,9 +18,9 @@ const baseQuery = fetchBaseQuery({
 export const ChatApi = createApi({
   reducerPath: "ChatApi",
   tagTypes: ["Chat", "Conversation", "Message"],
-  baseQuery: baseQuery,
+  baseQuery,
   endpoints: (builder) => ({
-    // Create a new conversation
+    // ✅ Create a new conversation
     createConversation: builder.mutation({
       query: (participantId) => ({
         url: "/chat",
@@ -30,37 +30,39 @@ export const ChatApi = createApi({
       invalidatesTags: ["Conversation"]
     }),
 
-    // Get conversation messages
+    // ✅ Get all messages in a conversation
     getConversationMessages: builder.query({
-      query: (conversationId) => `/chat/${conversationId}`,
+      query: (conversationId) => `/chat/${conversationId}/messages`,
       providesTags: ["Message"]
     }),
 
-    // Send a message
+    // ✅ Send a message in a conversation
     sendMessage: builder.mutation({
       query: ({ conversationId, content }) => ({
-        url: `/chat/${conversationId}/send-message`,
+        url: `/chat/${conversationId}/messages`,
         method: "POST",
-        body:  content 
+        body: content
       }),
       invalidatesTags: ["Message"]
     }),
 
-    // Mark messages as read
+    // ✅ Mark messages as read
     markMessagesAsRead: builder.mutation({
       query: (messageIds) => ({
         url: "/chat/messages/read",
         method: "POST",
-        body:  messageIds 
+        body: messageIds
       }),
       invalidatesTags: ["Message"]
     }),
 
-    // Get user conversations list
+    // ✅ Get conversations for current user
     getConversations: builder.query({
-      query: () => "/chat/users/conversations",
-      providesTags: ["Message"]
+      query: () => "/chat",
+      providesTags: ["Conversation"]
     }),
+
+    // Admin: get all users (unchanged)
     getUsers: builder.query({
       query: () => "/admin/allusers",
       providesTags: ["Conversation"]

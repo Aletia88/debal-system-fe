@@ -50,6 +50,7 @@ export function NavbarDemo() {
 
   const navItems = [
     { name: "Home", link: "/" },
+    { name: "Your Matches", link: "/matches" },
     { name: "Chat", link: "/chat" },
     { name: "Find Room", link: "/houseListing" },
   ];

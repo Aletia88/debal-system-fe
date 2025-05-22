@@ -52,6 +52,12 @@ export const ProfileApi = createApi({
             query: () =>`/profiles/recommendations`,
             providesTags: ["profiles"],
         }),
+        getFilteredUsers: builder.query({
+            query: (filters) => ({
+              url: '/users/filter-users',
+              params: filters,
+            }),
+          }),
 
         // Personal Info
         updatePersonalInfo: builder.mutation({
@@ -223,5 +229,6 @@ export const {
     useGetProviderProfileQuery,
     useUpdateProviderInfoMutation,
     useGetRecommendationQuery,
-    useRegisterProviderMutation
+    useRegisterProviderMutation,
+    useGetFilteredUsersQuery
 } = ProfileApi;

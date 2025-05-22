@@ -5,8 +5,7 @@ import { MessageCircle, Filter } from 'lucide-react';
 import { MatchCard } from '@/components/MatchCard';
 import { ChatWindow } from '@/components/Chat/ChatWindow';
 import FilterSidebar from '@/components/filter-sidebar';
-import { useGetFilteredUsersQuery, useGetProfileByRecommendationQuery } from '@/store/profile';
-import { FilterUser } from '@/components/Filteruser';
+import { useGetProfileByRecommendationQuery } from '@/store/profile';
 
 export default function MatchesPage() {
   const [chatOpen, setChatOpen] = useState(false);
@@ -17,7 +16,7 @@ export default function MatchesPage() {
   const [filters, setFilters] = useState({});
   
   // Use the filters in the query
-  const { data: users, isLoading, isError } = useGetFilteredUsersQuery(filters)
+  const { data: recommendations, isLoading, isError } = useGetProfileByRecommendationQuery(filters);
 
   const handleMessageClick = (userId: string) => {
     const numericId = parseInt(userId, 10) || 1;
@@ -53,13 +52,11 @@ export default function MatchesPage() {
     );
   }
 
-  console.log(users)
-
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Filter Sidebar */}
       {showFilter && (
-        <div className="fixed overflow-y-hidden inset-0 z-50 flex">
+        <div className="fixed inset-0 z-50 flex">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowFilter(false)} />
           <aside className="relative z-50 bg-white h-full w-full max-w-md shadow-lg">
             <FilterSidebar 
@@ -87,8 +84,8 @@ export default function MatchesPage() {
           <p className="text-gray-500 mb-6">Find your perfect roommate match!</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {users?.map((reco: any) => (
-              <FilterUser 
+            {recommendations?.recommendations?.map((reco: any) => (
+              <MatchCard 
                 key={reco.user_id}
                 recommendation={reco}
                 onMessageClick={handleMessageClick}
@@ -96,7 +93,7 @@ export default function MatchesPage() {
               />
             ))}
 
-            {(!users || users.users?.length === 0) && (
+            {(!recommendations || recommendations.recommendations?.length === 0) && (
               <div className="col-span-full text-center py-10 text-gray-500">
                 No matches found. Try adjusting your filters.
               </div>

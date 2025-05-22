@@ -4,37 +4,53 @@ import { useState } from "react"
 import { X, Check } from "lucide-react"
 import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
+import { useGetFilteredUsersQuery } from "@/store/profile"
 
 interface FilterSidebarProps {
   onClose: () => void
+  onFiltersApplied: (filters: any) => void
 }
 
-export default function FilterSidebar({ onClose }: FilterSidebarProps) {
-  const [gender, setGender] = useState<"male" | "female" | "any">("male")
-  const [budget, setBudget] = useState([100000, 150000])
-  const [needType, setNeedType] = useState<"room" | "roommate">("room")
-  const [leaseDurations, setLeaseDurations] = useState([true, true, true, true])
-
-  const handleLeaseDurationChange = (index: number) => {
-    const newLeaseDurations = [...leaseDurations]
-    newLeaseDurations[index] = !newLeaseDurations[index]
-    setLeaseDurations(newLeaseDurations)
-  }
+export default function FilterSidebar({ onClose, onFiltersApplied }: FilterSidebarProps) {
+  const [gender, setGender] = useState<string>("")
+  const [ageRange, setAgeRange] = useState([18, 60])
+  const [occupation, setOccupation] = useState("")
+  const [religion, setReligion] = useState("")
+  const [city, setCity] = useState("")
+  const [country, setCountry] = useState("")
+  const [isOnline, setIsOnline] = useState<boolean | null>(null)
+  const [hasPets, setHasPets] = useState<boolean | null>(null)
 
   const handleReset = () => {
-    setGender("male")
-    setBudget([100000, 150000])
-    setNeedType("room")
-    setLeaseDurations([true, true, true, true])
+    setGender("")
+    setAgeRange([18, 60])
+    setOccupation("")
+    setReligion("")
+    setCity("")
+    setCountry("")
+    setIsOnline(null)
+    setHasPets(null)
   }
 
   const handleApply = () => {
-    // Apply filters logic here
+    const filters = {
+      ...(gender && { gender }),
+      ageMin: ageRange[0],
+      ageMax: ageRange[1],
+      ...(occupation && { occupation }),
+      ...(religion && { religion }),
+      ...(city && { city }),
+      ...(country && { country }),
+      ...(isOnline !== null && { isOnline: isOnline.toString() }),
+      ...(hasPets !== null && { hasPets: hasPets.toString() }),
+    }
+
+    onFiltersApplied(filters)
     onClose()
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md overflow-y-auto">
       <div className="flex justify-end mb-8">
         <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
           <X size={24} />
@@ -43,7 +59,7 @@ export default function FilterSidebar({ onClose }: FilterSidebarProps) {
 
       {/* Gender Selection */}
       <div className="mb-8">
-        <h3 className="text-gray-500 mb-4">Select Gender</h3>
+        <h3 className="text-gray-500 mb-4">Gender</h3>
         <div className="flex space-x-4">
           <button
             onClick={() => setGender("male")}
@@ -66,9 +82,9 @@ export default function FilterSidebar({ onClose }: FilterSidebarProps) {
             Female
           </button>
           <button
-            onClick={() => setGender("any")}
+            onClick={() => setGender("")}
             className={`px-6 py-2 rounded-md transition-colors ${
-              gender === "any"
+              gender === ""
                 ? "border-2 border-purple-500 text-purple-600"
                 : "border border-gray-200 text-gray-500 hover:border-purple-200"
             }`}
@@ -78,69 +94,140 @@ export default function FilterSidebar({ onClose }: FilterSidebarProps) {
         </div>
       </div>
 
-      {/* Budget Range */}
+      {/* Age Range */}
       <div className="mb-8">
         <div className="flex justify-between mb-2">
-          <h3 className="text-gray-500">Budget</h3>
+          <h3 className="text-gray-500">Age Range</h3>
           <span className="text-purple-600 font-medium">
-            NGN{budget[0].toLocaleString()} - {budget[1].toLocaleString()}
+            {ageRange[0]} - {ageRange[1]} years
           </span>
         </div>
         <Slider
-          defaultValue={budget}
-          min={50000}
-          max={500000}
-          step={10000}
-          value={budget}
-          onValueChange={setBudget}
+          defaultValue={ageRange}
+          min={18}
+          max={100}
+          step={1}
+          value={ageRange}
+          onValueChange={setAgeRange}
           className="mt-6"
         />
       </div>
 
-      {/* Need Type */}
+      {/* Occupation */}
       <div className="mb-8">
-        <h3 className="text-gray-500 mb-4">I Need a</h3>
+        <h3 className="text-gray-500 mb-2">Occupation</h3>
+        <input
+          type="text"
+          placeholder="e.g. developer, teacher"
+          value={occupation}
+          onChange={(e) => setOccupation(e.target.value)}
+          className="w-full p-2 border border-gray-200 rounded-md focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+        />
+      </div>
+
+      {/* Religion */}
+      <div className="mb-8">
+        <h3 className="text-gray-500 mb-2">Religion</h3>
+        <input
+          type="text"
+          placeholder="e.g. christian, muslim"
+          value={religion}
+          onChange={(e) => setReligion(e.target.value)}
+          className="w-full p-2 border border-gray-200 rounded-md focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+        />
+      </div>
+
+      {/* Location */}
+      <div className="mb-8">
+        <h3 className="text-gray-500 mb-2">City</h3>
+        <input
+          type="text"
+          placeholder="e.g. Addis Ababa"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          className="w-full p-2 border border-gray-200 rounded-md focus:border-purple-500 focus:ring-1 focus:ring-purple-500 mb-4"
+        />
+        <h3 className="text-gray-500 mb-2">Country</h3>
+        <input
+          type="text"
+          placeholder="e.g. Ethiopia"
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+          className="w-full p-2 border border-gray-200 rounded-md focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+        />
+      </div>
+
+      {/* Online Status */}
+      <div className="mb-8">
+        <h3 className="text-gray-500 mb-4">Online Status</h3>
         <div className="flex space-x-4">
           <button
-            onClick={() => setNeedType("room")}
+            onClick={() => setIsOnline(true)}
             className={`px-6 py-2 rounded-md transition-colors ${
-              needType === "room"
+              isOnline === true
                 ? "border-2 border-purple-500 text-purple-600"
                 : "border border-gray-200 text-gray-500 hover:border-purple-200"
             }`}
           >
-            Room
+            Online
           </button>
           <button
-            onClick={() => setNeedType("roommate")}
+            onClick={() => setIsOnline(false)}
             className={`px-6 py-2 rounded-md transition-colors ${
-              needType === "roommate"
+              isOnline === false
                 ? "border-2 border-purple-500 text-purple-600"
                 : "border border-gray-200 text-gray-500 hover:border-purple-200"
             }`}
           >
-            Roommate
+            Offline
+          </button>
+          <button
+            onClick={() => setIsOnline(null)}
+            className={`px-6 py-2 rounded-md transition-colors ${
+              isOnline === null
+                ? "border-2 border-purple-500 text-purple-600"
+                : "border border-gray-200 text-gray-500 hover:border-purple-200"
+            }`}
+          >
+            Any
           </button>
         </div>
       </div>
 
-      {/* Lease Duration */}
+      {/* Pets */}
       <div className="mb-8">
-        <h3 className="text-gray-500 mb-4">Lease Duration</h3>
-        <div className="grid grid-cols-2 gap-4">
-          {[0, 1, 2, 3].map((index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <div
-                className={`w-5 h-5 rounded flex items-center justify-center ${
-                  leaseDurations[index] ? "bg-purple-600" : "border border-gray-300"
-                }`}
-                onClick={() => handleLeaseDurationChange(index)}
-              >
-                {leaseDurations[index] && <Check size={14} className="text-white" />}
-              </div>
-              <span className="text-gray-700">6 Months</span>
-            </div>
-          ))}
+        <h3 className="text-gray-500 mb-4">Has Pets</h3>
+        <div className="flex space-x-4">
+          <button
+            onClick={() => setHasPets(true)}
+            className={`px-6 py-2 rounded-md transition-colors ${
+              hasPets === true
+                ? "border-2 border-purple-500 text-purple-600"
+                : "border border-gray-200 text-gray-500 hover:border-purple-200"
+            }`}
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => setHasPets(false)}
+            className={`px-6 py-2 rounded-md transition-colors ${
+              hasPets === false
+                ? "border-2 border-purple-500 text-purple-600"
+                : "border border-gray-200 text-gray-500 hover:border-purple-200"
+            }`}
+          >
+            No
+          </button>
+          <button
+            onClick={() => setHasPets(null)}
+            className={`px-6 py-2 rounded-md transition-colors ${
+              hasPets === null
+                ? "border-2 border-purple-500 text-purple-600"
+                : "border border-gray-200 text-gray-500 hover:border-purple-200"
+            }`}
+          >
+            Any
+          </button>
         </div>
       </div>
 
