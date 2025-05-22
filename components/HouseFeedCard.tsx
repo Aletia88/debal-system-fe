@@ -27,7 +27,7 @@ interface HouseFeedCardProps {
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
  const HouseFeedCard = ({ house }: HouseFeedCardProps) => {
   const router = useRouter();
-  const firstPhoto = house.photos?.[0]?.url 
+  const firstPhoto = house.photos[0] 
 
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow">

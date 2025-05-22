@@ -83,15 +83,21 @@ export default function MatchesPage() {
     <div className="min-h-screen bg-gray-50 flex">
       {/* Filter Sidebar */}
       {showFilter && (
-        <div className="fixed overflow-y-hidden inset-0 z-50 flex">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setShowFilter(false)} />
-          <aside className="relative z-50 bg-white h-full w-full max-w-md shadow-lg">
-            <FilterSidebar 
-              onClose={() => setShowFilter(false)}
-              onFiltersApplied={handleFiltersApplied}
-            />
-          </aside>
-        </div>
+       <div className="fixed inset-0 z-50 flex">
+       {/* Semi-transparent overlay that closes the filter when clicked */}
+       <div 
+         className="absolute inset-0 bg-black/50" 
+         onClick={() => setShowFilter(false)} 
+       />
+       
+       {/* Scrollable filter sidebar */}
+       <aside className="relative z-50 bg-white h-full w-full max-w-md shadow-lg overflow-y-auto scrollbar-hide">
+         <FilterSidebar 
+           onClose={() => setShowFilter(false)}
+           onFiltersApplied={handleFiltersApplied}
+         />
+       </aside>
+     </div>
       )}
       
       <div className="flex-1">
