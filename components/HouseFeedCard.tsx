@@ -56,8 +56,8 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
             <span className="text-sm">{house.bathrooms} baths</span>
           </div>
           <div className="flex items-center">
-            <DollarSign size={14} className="mr-1 text-gray-600" />
-            <span className="text-sm">{house.rent.amount} {house.rent.currency}</span>
+            {/* <DollarSign size={14} className="mr-1 text-gray-600" /> */}
+            <span className="text-sm">{house.rent.amount} BIRR</span>
           </div>
         </div>
         

@@ -41,6 +41,7 @@ export const HouseApi = createApi({
           method: "POST",
           body:  formData 
         }),
+        invalidatesTags: ['listing'],
       }),
       createRules: builder.mutation({
         query: (formData: FormData) => ({
@@ -48,6 +49,7 @@ export const HouseApi = createApi({
           method: "POST",
           body:  formData 
         }),
+        invalidatesTags: ['listing'],
       }),
       getList: builder.query({
         query: () => `/list`,
@@ -126,12 +128,14 @@ export const HouseApi = createApi({
           method: 'POST',
           body: images,
         }),
+        invalidatesTags: ['listing'],
       }),
       deleteListingImage: builder.mutation({
         query: ({ id, imageId }) => ({
           url: `list/images/${id}/${imageId}`,
           method: 'DELETE',
         }),
+        invalidatesTags: ['listing'],
       }),
       // createListing: builder.mutation({
       //   query: (formData) => ({
