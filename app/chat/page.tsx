@@ -6,6 +6,7 @@ import { useGetConversationsQuery } from "@/store/chat";
 import { useGetProfileQuery } from "@/store/profile";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Flex } from "@mantine/core";
 
 export default function ChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -17,15 +18,20 @@ export default function ChatPage() {
   const newChatUserId = searchParams.get('newChat');
 
   const { data: user } = useGetProfileQuery({});
-  const { data: conversations, isLoading: isLoadingConversations } = useGetConversationsQuery({});
+  const { data: conversations, isLoading: isLoadingConversations } = useGetConversationsQuery({}, {
+    pollingInterval: 2000, // Refetch every 2 seconds
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true
+  });
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   useEffect(() => {
     if (newChatUserId) {
       // Check if conversation already exists with this user
-      const existingConversation = conversations?.data.find(conv => 
-        conv.participant._id === newChatUserId
+      const existingConversation = conversations?.data.find((conv:any) => 
+        conv.otherParticipant._id === newChatUserId
       );
       
       if (existingConversation) {
@@ -38,14 +44,15 @@ export default function ChatPage() {
   }, [newChatUserId, conversations]);
 
   return (
-    <div style={{ maxHeight: '100vh' }}>
+    <div className="h-screen flex flex-col">
       <ChatHeader 
         onNewChat={() => setShowNewChatDialog(true)}
         toggleSidebar={toggleSidebar}
         sidebarOpen={sidebarOpen}
       />
       
-      <div className="flex flex-1 overflow-hidden">
+      {/* <div className="flex flex-1 overflow-hidden"> */}
+      <Flex wrap='nowrap' className="overflow-hidden h-full">
         {sidebarOpen && (
           <ChatSidebar
             conversations={conversations?.data || []}
@@ -71,7 +78,8 @@ export default function ChatPage() {
             window.history.replaceState(null, '', '/chat');
           }}
         />
-      </div>
+        </Flex>
+      {/* </div> */}
     </div>
   );
 }
