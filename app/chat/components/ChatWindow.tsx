@@ -54,7 +54,7 @@ export default function ChatWindow({
   
   const { data: messagesResponse, isLoading: isLoadingMessages, refetch: refetchMessages } = useGetConversationMessagesQuery(activeChat || "", {
     skip: !activeChat,
-    pollingInterval: 5000
+    pollingInterval: 1000
   });
   
   const [sendMessage] = useSendMessageMutation();

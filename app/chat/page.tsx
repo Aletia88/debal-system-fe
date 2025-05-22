@@ -19,7 +19,7 @@ export default function ChatPage() {
 
   const { data: user } = useGetProfileQuery({});
   const { data: conversations, isLoading: isLoadingConversations } = useGetConversationsQuery({}, {
-    pollingInterval: 2000, // Refetch every 2 seconds
+    pollingInterval: 1000, // Refetch every 2 seconds
     refetchOnMountOrArgChange: true,
     refetchOnFocus: true,
     refetchOnReconnect: true
