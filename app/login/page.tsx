@@ -75,7 +75,7 @@ export default function SignUpPage() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <main style={{ flex: 1, display: 'flex', alignItems: 'center', padding: rem(32) }}>
+      <main className="p-0 md:p-10" style={{ flex: 1, display: 'flex', alignItems: 'center',  }}>
         <div style={{ width: '100%', maxWidth: rem(1200), margin: '0 auto' }}>
           {/* <div style={{ marginBottom: rem(32) }}>
             <Title order={1} c="gray.8">Sign Up</Title>
@@ -88,12 +88,13 @@ export default function SignUpPage() {
             gap: rem(32),
             alignItems: 'center'
           }}>
-            <div style={{
+            <div className="hidden md:block" style={{
               position: 'relative',
               height: '70vh',
               minHeight: rem(400),
               borderRadius: 'var(--mantine-radius-lg)',
               overflow: 'hidden'
+
             }}>
               <Image
                 src="/room.png"

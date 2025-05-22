@@ -50,11 +50,11 @@ export default function ChatPage() {
   return (
     <div className="h-screen flex flex-col">
 
-     {!activeChat && <ChatHeader 
+      <ChatHeader 
         onNewChat={() => setShowNewChatDialog(true)}
         toggleSidebar={toggleSidebar}
         sidebarOpen={sidebarOpen}
-      />}
+      />
       
       {/* <div className="flex flex-1 overflow-hidden"> */}
       {isMobile ? (
