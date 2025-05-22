@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import PersonalInfo from "./components/personal-info"
 import LifestyleInfo from "./components/LifestyleInfo"
-import { FileInput, Modal, ModalContent, SimpleGrid, Stack } from "@mantine/core"
+import { Badge, FileInput, Modal, ModalContent, SimpleGrid, Stack } from "@mantine/core"
 import NeighborhoodInfo from "./components/NeighborhoodInfo"
 import WorkInfo from "./components/WorkInfo"
 import FoodInfo from "./components/FoodInfo"
@@ -152,6 +152,31 @@ export default function ProfilePage() {
         <div className="mt-12">
           <h2 className="text-xl font-semibold">{profile?.user.name}</h2>
           <p className="text-purple-200 text-sm">{profile?.user.email}</p>
+
+          <div className="mt-2 flex justify-center gap-2 flex-wrap">
+                      {!profile?.user.isVerified && (
+                        // <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center">
+                         
+                        // </span>
+                        <Badge color="yellow" variant="light"> Not Verified</Badge>
+                      )}
+                      {profile?.user.isblocked && (
+                        
+                         <Badge color="red" variant="light"> Blocked</Badge>
+                      )}
+                      {profile?.user.issuspended && (
+                       
+                        <Badge color="orange" variant="light"> Suspended</Badge>
+                      )}
+                      {profile?.user.isdeleted && (
+                      
+                        <Badge color="gray" variant="light"> Deleted</Badge>
+                      )}
+                      {profile?.user.isreported && (
+                       
+                        <Badge color="purple" variant="light"> Reported</Badge>
+                      )}
+                    </div>
 
           <div className="flex justify-center mt-4 space-x-4">
             <button className="bg-purple-800 p-2 rounded-full hover:bg-purple-700">

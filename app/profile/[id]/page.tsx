@@ -1,7 +1,7 @@
 'use client'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useGetProfileByIdQuery, useGetProfileQuery } from "@/store/profile"
-import { Button, Modal, Rating, SimpleGrid, Stack, Textarea, TextInput } from "@mantine/core"
+import { Badge, Button, Modal, Rating, SimpleGrid, Stack, Textarea, TextInput } from "@mantine/core"
 import { Twitter, Facebook, Instagram, Check, ChevronLeft, ChevronRight, X, MessageCircle, Flag } from "lucide-react"
 import Image from "next/image"
 import { useParams } from "next/navigation"
@@ -159,6 +159,31 @@ const ProfileDetail = () => {
         <div className="mt-12">
           <h2 className="text-xl font-semibold">{profile?.user.name}</h2>
           <p className="text-purple-200 text-sm">{profile?.user.email}</p>
+
+          <div className="mt-2 flex justify-center gap-2 flex-wrap">
+            {!profile?.user.isVerified && (
+              // <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center">
+               
+              // </span>
+              <Badge color="yellow" variant="light"> Not Verified</Badge>
+            )}
+            {profile?.user.isblocked && (
+              
+               <Badge color="red" variant="light"> Blocked</Badge>
+            )}
+            {profile?.user.issuspended && (
+             
+              <Badge color="orange" variant="light"> Suspended</Badge>
+            )}
+            {profile?.user.isdeleted && (
+            
+              <Badge color="gray" variant="light"> Deleted</Badge>
+            )}
+            {profile?.user.isreported && (
+             
+              <Badge color="purple" variant="light"> Reported</Badge>
+            )}
+          </div>
 
           <div className="flex justify-center mt-4 space-x-4">
             <button className="bg-purple-800 p-2 rounded-full hover:bg-purple-700">
