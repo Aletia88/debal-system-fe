@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import { useMediaQuery } from "@mantine/hooks";
 
 interface ChatHeaderProps {
   onNewChat: () => void;
@@ -11,6 +12,7 @@ interface ChatHeaderProps {
 
 export default function ChatHeader({ onNewChat, toggleSidebar, sidebarOpen }: ChatHeaderProps) {
   const router = useRouter();
+  const isMobile = useMediaQuery("(max-width: 768px)");
   
   return (
     <div className="p-3 border-b flex justify-between items-center bg-purple-50">
@@ -18,13 +20,14 @@ export default function ChatHeader({ onNewChat, toggleSidebar, sidebarOpen }: Ch
         <IconArrowLeft onClick={() => router.push('/')} className='cursor-pointer' size={16} />
         <h2 className="font-bold text-lg text-purple-900">Messages</h2>
       </div>
+      {!isMobile &&
       <Button
         onClick={onNewChat}
         className="bg-purple-600 hover:bg-purple-700 text-white"
         size="sm"
       >
         <Plus size={16} className="mr-1" /> New Chat
-      </Button>
+      </Button>}
     </div>
   );
 }

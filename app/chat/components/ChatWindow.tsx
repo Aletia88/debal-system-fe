@@ -2,10 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import { useGetConversationMessagesQuery, useSendMessageMutation, useMarkMessagesAsReadMutation } from "@/store/chat";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, ChevronLeft, MoreVertical, Paperclip, Mic, MessageCircle, Loader2 } from "lucide-react";
+import { Send, ChevronLeft, MoreVertical, Paperclip, Mic, MessageCircle, Loader2, AlignJustify } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import NewChatDialog from "./NewChatDialog";
+import { IconBurger } from "@tabler/icons-react";
 
 interface ChatWindowProps {
   setActiveChat: (id: string) => void;
@@ -125,8 +126,8 @@ export default function ChatWindow({
               {/* Header */}
               <div className="p-3 bg-[#fff] text-black flex items-center sticky top-0 z-10 h-[60px] w-full">
                 {isMobile && (
-                  <button onClick={toggleSidebar} className="mr-2">
-                    <ChevronLeft size={24} />
+                  <button onClick={()=>setActiveChat('')} className="mr-2">
+                    <AlignJustify color="#9F12E0" size={24} />
                   </button>
                 )}
                 <Avatar className="h-10 w-10 mr-3">
@@ -143,7 +144,7 @@ export default function ChatWindow({
               </div>
 
               {/* Messages area */}
-              <div className="flex-1 overflow-y-auto scrollbar-hide    p-4 w-full h-full mt-12" >
+              <div className="flex-1 overflow-y-auto scrollbar-hide    p-4 w-full h-full md:mt-12" >
                 {isLoadingMessages ? (
                   <div className="flex justify-center items-center h-full">
                     <div className="animate-pulse">Loading messages...</div>
