@@ -98,7 +98,7 @@ export const FilterUser = ({ recommendation, onMessageClick, onLikeToggle }: Mat
       >
         <div className="relative h-48">
           <Image 
-            src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image.png"}
+            src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image."}
             alt={recommendation.name} 
             fill 
             className="object-cover" 
@@ -165,7 +165,7 @@ export const FilterUser = ({ recommendation, onMessageClick, onLikeToggle }: Mat
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative h-64 w-full rounded-lg overflow-hidden">
               <Image
-                src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image.png"}
+                src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image."}
                 alt={recommendation.name}
                 fill
                 className="object-cover"
