@@ -5,7 +5,7 @@ import MyListings from './components/myListing';
 
 export default function HouseListingPage() {
   return (
-    <div className="p-4">
+    <div className="md:p-4 pt-4 px-1">
       <Tabs defaultValue="all">
         <Tabs.List>
           <Tabs.Tab value="all">All Listings</Tabs.Tab>

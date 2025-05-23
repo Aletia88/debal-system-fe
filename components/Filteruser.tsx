@@ -9,50 +9,59 @@ import { useRouter } from "next/navigation";
 interface Photo {
   url: string;
   isProfile: boolean;
+  filename?: string;
   // Add other photo properties if needed
 }
 
+interface PersonalInfo {
+  age: number;
+  gender: string;
+  occupation?: string;
+  religion?: string;
+  relationship_status?: string;
+}
+
+interface Lifestyle {
+  personality_type?: string;
+  daily_routine?: string;
+  sleep_pattern?: string;
+}
+
+interface SharedLiving {
+  cleanliness_level?: string;
+  chore_sharing_preference?: string;
+  noise_tolerance?: string;
+  guest_frequency?: string;
+  party_habits?: string;
+}
+
 interface RecommendationUser {
-  user_id
-: string;
+  user_id: string;
   name: string;
-  email: string;
+  email?: string;
   photos?: Photo[];
-  personalInfo: {
-    age: number;
-    gender: string;
-    occupation: string;
-    religion: string;
-    relationship_status: string;
-  };
-  lifestyle: {
-    personality_type: string;
-    daily_routine: string;
-    sleep_pattern: string;
-  };
-  hobbies: string[];
-  sharedLiving: {
-    cleanliness_level: string;
-    chore_sharing_preference: string;
-    noise_tolerance: string;
-    guest_frequency: string;
-    party_habits: string;
-  };
+  personalInfo?: PersonalInfo;
+  lifestyle?: Lifestyle;
+  hobbies?: string[];
+  sharedLiving?: SharedLiving;
+}
+
+interface Recommendation {
+  user_id: string;
+  compatibility_score?: number;
+  cluster_id?: number;
+  age?: number;
+  gender?: string;
+  personality_type?: string;
+  hobbies?: string[];
+  user: RecommendationUser;
+  name?: string;
+  occupation?: string;
+  religion?: string;
 }
 
 interface MatchCardProps {
-  recommendation: {
-    useruser_id
-: string;
-    compatibility_score: number;
-    clusteruser_id
-: number;
-    age: number;
-    gender: string;
-    personality_type: string;
-    hobbies: string[];
-    user: RecommendationUser;
-  };
+  recommendation: Recommendation;
   onMessageClick?: (userId: string) => void;
   onLikeToggle?: (userId: string, liked: boolean) => void;
 }
@@ -66,14 +75,12 @@ export const FilterUser = ({ recommendation, onMessageClick, onLikeToggle }: Mat
   const handleStartChat = (id: string) => {
     router.push(`/chat?newChat=${id}`);
   };
-  console.log('re',recommendation)
 
   const toggleLike = () => {
     const newLikedState = !isLiked;
     setIsLiked(newLikedState);
     if (onLikeToggle) {
-      onLikeToggle(recommendation.useruser_id
-, newLikedState);
+      onLikeToggle(recommendation.user_id, newLikedState);
     }
   };
 
@@ -86,9 +93,13 @@ export const FilterUser = ({ recommendation, onMessageClick, onLikeToggle }: Mat
     }
   };
 
-  
-  const profilePhoto = recommendation?.photos?.find(photo => photo.isProfile);
-  console.log(profilePhoto)
+  const profilePhoto = recommendation.user?.photos?.find(photo => photo.isProfile);
+  const name = recommendation.user?.name || recommendation.name;
+  const age = recommendation.user?.personalInfo?.age || recommendation.age;
+  const gender = recommendation.user?.personalInfo?.gender || recommendation.gender;
+  const occupation = recommendation.user?.personalInfo?.occupation || recommendation.occupation;
+  const religion = recommendation.user?.personalInfo?.religion || recommendation.religion;
+  const hobbies = recommendation.user?.hobbies || recommendation.hobbies || [];
 
   return (
     <>
@@ -98,8 +109,8 @@ export const FilterUser = ({ recommendation, onMessageClick, onLikeToggle }: Mat
       >
         <div className="relative h-48">
           <Image 
-            src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image."}
-            alt={recommendation.name} 
+            src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image"}
+            alt={profilePhoto?.filename || "Profile image"} 
             fill 
             className="object-cover" 
           />
@@ -127,16 +138,14 @@ export const FilterUser = ({ recommendation, onMessageClick, onLikeToggle }: Mat
           </button>
         </div>
         <div className="p-4">
-          <h3 className="font-bold text-lg">{recommendation.name}</h3>
+          <h3 className="font-bold text-lg">{name}</h3>
           <div className="flex justify-end items-center mt-2">
-          
             <div className="flex space-x-2">
               <button 
                 className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleStartChat(recommendation.user_id
-);
+                  handleStartChat(recommendation.user_id);
                 }}
               >
                 <MessageCircle size={18} />
@@ -145,8 +154,7 @@ export const FilterUser = ({ recommendation, onMessageClick, onLikeToggle }: Mat
                 className="p-2 bg-white border border-gray-300 text-gray-600 rounded-full hover:bg-gray-50"
                 onClick={(e) => {
                   e.stopPropagation();
-                  router.push(`/profile/${recommendation.user_id
-}`);
+                  router.push(`/profile/${recommendation.user_id}`);
                 }}
               >
                 <Contact2 size={18} />
@@ -160,59 +168,49 @@ export const FilterUser = ({ recommendation, onMessageClick, onLikeToggle }: Mat
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-md md:max-w-xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl">{recommendation.name}</DialogTitle>
+            <DialogTitle className="text-2xl">{name}</DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative h-64 w-full rounded-lg overflow-hidden">
               <Image
-                src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image."}
-                alt={recommendation.name}
+                src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image"}
+                alt={name || "Profile image"}
                 fill
                 className="object-cover"
               />
             </div>
             <div className="space-y-4">
-              {/* <div className="flex items-center space-x-4">
-                <div className="text-orange-400 font-bold text-xl">
-                  {matchPercentage}% Match
-                </div>
-                <button 
-                  onClick={toggleLike}
-                  className="p-2 bg-white border rounded-full hover:bg-gray-50"
-                >
-                  <Heart 
-                    size={20} 
-                    fill={isLiked ? "red" : "none"} 
-                    color={isLiked ? "red" : "currentColor"} 
-                  />
-                </button>
-              </div> */}
-              
               <div>
                 <h4 className="text-sm text-gray-500">Age</h4>
-                <p className="font-medium">{recommendation.age}</p>
+                <p className="font-medium">{age}</p>
               </div>
               
-              <div>
-                <h4 className="text-sm text-gray-500">Occupation</h4>
-                <p className="font-medium">{recommendation.occupation}</p>
-              </div>
+              {occupation && (
+                <div>
+                  <h4 className="text-sm text-gray-500">Occupation</h4>
+                  <p className="font-medium">{occupation}</p>
+                </div>
+              )}
               
-              <div>
-                <h4 className="text-sm text-gray-500">Gender</h4>
-                <p className="font-medium">{recommendation.gender}</p>
-              </div>
+              {gender && (
+                <div>
+                  <h4 className="text-sm text-gray-500">Gender</h4>
+                  <p className="font-medium">{gender}</p>
+                </div>
+              )}
               
-              <div>
-                <h4 className="text-sm text-gray-500">Religion</h4>
-                <p className="font-medium">{recommendation.religion}</p>
-              </div>
+              {religion && (
+                <div>
+                  <h4 className="text-sm text-gray-500">Religion</h4>
+                  <p className="font-medium">{religion}</p>
+                </div>
+              )}
               
-              {recommendation?.hobbies?.length > 0 && (
+              {hobbies.length > 0 && (
                 <div>
                   <h4 className="text-sm text-gray-500">Hobbies</h4>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {recommendation?.hobbies?.map((hobby, index) => (
+                    {hobbies.map((hobby, index) => (
                       <span 
                         key={index} 
                         className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
@@ -229,16 +227,14 @@ export const FilterUser = ({ recommendation, onMessageClick, onLikeToggle }: Mat
                   className="flex-1 flex items-center justify-center gap-2 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700"
                   onClick={() => {
                     closeModal();
-                    handleStartChat(recommendation.user_id
-);
+                    handleStartChat(recommendation.user_id);
                   }}
                 >
                   <MessageCircle size={18} />
                   Message
                 </button>
                 <button 
-                  onClick={() => router.push(`/profile/${recommendation.user_id
-}`)} 
+                  onClick={() => router.push(`/profile/${recommendation.user_id}`)} 
                   className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50"
                 >
                   <Contact2 size={18} />

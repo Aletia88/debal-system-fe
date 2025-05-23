@@ -1,6 +1,5 @@
 'use client'
 import React, { useState } from 'react';
-
 import {
   Box,
   Button,
@@ -22,6 +21,32 @@ import { useDisclosure } from '@mantine/hooks';
 import { IconEdit, IconPlus } from '@tabler/icons-react';
 import { useCreateRulesMutation, useGetHouseRulesQuery, useUpdateRuleMutation } from '@/store/houseListing';
 
+interface Rule {
+  _id: string;
+  name: string;
+  description: string;
+  isActive: boolean;
+}
+
+interface CurrentRule {
+  _id?: string;
+  name: string;
+  description: string;
+  isActive: boolean;
+}
+
+interface CreateRuleData {
+  name: string;
+  description: string;
+  isActive: boolean;
+}
+
+interface UpdateRuleData {
+  name?: string;
+  description?: string;
+  isActive?: boolean;
+}
+
 const HouseRulesPage = () => {
   // Fetch house rules
   const { data: rules, isLoading, isError, refetch } = useGetHouseRulesQuery({});
@@ -31,14 +56,14 @@ const HouseRulesPage = () => {
   // Modal state
   const [opened, { open, close }] = useDisclosure(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [currentRule, setCurrentRule] = useState({
+  const [currentRule, setCurrentRule] = useState<CurrentRule>({
     name: '',
     description: '',
     isActive: true,
   });
 
   // Handle form input changes
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setCurrentRule(prev => ({
       ...prev,
@@ -58,7 +83,7 @@ const HouseRulesPage = () => {
   };
 
   // Open modal for editing rule
-  const handleOpenEditModal = (rule) => {
+  const handleOpenEditModal = (rule: Rule) => {
     setIsEditing(true);
     setCurrentRule({
       _id: rule._id,
@@ -70,24 +95,26 @@ const HouseRulesPage = () => {
   };
 
   // Submit form (create or update)
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (isEditing) {
-        await updateRule({
-          id: currentRule._id,
-          data: {
-            name: currentRule.name,
-            description: currentRule.description,
-            isActive: currentRule.isActive,
-          },
-        }).unwrap();
-      } else {
-        await createRule({
+      if (isEditing && currentRule._id) {
+        const updateData: UpdateRuleData = {
           name: currentRule.name,
           description: currentRule.description,
           isActive: currentRule.isActive,
+        };
+        await updateRule({
+          id: currentRule._id,
+          data: updateData,
         }).unwrap();
+      } else {
+        const createData: CreateRuleData = {
+          name: currentRule.name,
+          description: currentRule.description,
+          isActive: currentRule.isActive,
+        };
+        await createRule(createData).unwrap();
       }
       refetch();
       close();
@@ -97,7 +124,7 @@ const HouseRulesPage = () => {
   };
 
   // Toggle rule active status manually
-  const handleToggleStatus = async (ruleId, currentStatus) => {
+  const handleToggleStatus = async (ruleId: string, currentStatus: boolean) => {
     try {
       await updateRule({
         id: ruleId,
@@ -114,7 +141,7 @@ const HouseRulesPage = () => {
 
   return (
     <Container size='xl' p="md">
-      <Group justify="apart" mb="md">
+      <Group justify="space-between" mb="md">
         <Text size="xl" fw={700}>House Rules</Text>
         <Button
           leftSection={<IconPlus size={16} />}
@@ -124,38 +151,36 @@ const HouseRulesPage = () => {
         </Button>
       </Group>
 
-      <SimpleGrid cols={{base:1, sm:2,md:3}}>
-        {rules?.map((rule:any) => (
-        //   <Grid.Col key={rule._id} sm={6} md={4}>
-            <Card shadow="sm" padding="lg" radius="md" withBorder>
-              <Group justify="apart" mb="xs">
-                <Text fw={500}>{rule.name}</Text>
-                <Badge color={rule.isActive ? 'green' : 'gray'}>
-                  {rule.isActive ? 'Active' : 'Inactive'}
-                </Badge>
-              </Group>
+      <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
+        {rules?.map((rule: Rule) => (
+          <Card key={rule._id} shadow="sm" padding="lg" radius="md" withBorder>
+            <Group justify="space-between" mb="xs">
+              <Text fw={500}>{rule.name}</Text>
+              <Badge color={rule.isActive ? 'green' : 'gray'}>
+                {rule.isActive ? 'Active' : 'Inactive'}
+              </Badge>
+            </Group>
 
-              <Text size="sm" color="dimmed" mb="md">
-                {rule.description}
-              </Text>
+            <Text size="sm" color="dimmed" mb="md">
+              {rule.description}
+            </Text>
 
-              <Group justify="apart">
-                <Group gap="xs">
-                  <Switch
-                    checked={rule.isActive}
-                    onChange={() => handleToggleStatus(rule._id, rule.isActive)}
-                    label={rule.isActive ? 'Disable' : 'Enable'}
-                  />
-                </Group>
-                <ActionIcon
-                  color="blue"
-                  onClick={() => handleOpenEditModal(rule)}
-                >
-                  <IconEdit size={18} />
-                </ActionIcon>
+            <Group justify="space-between">
+              <Group gap="xs">
+                <Switch
+                  checked={rule.isActive}
+                  onChange={() => handleToggleStatus(rule._id, rule.isActive)}
+                  label={rule.isActive ? 'Disable' : 'Enable'}
+                />
               </Group>
-            </Card>
-        //   </Grid.Col>
+              <ActionIcon
+                color="blue"
+                onClick={() => handleOpenEditModal(rule)}
+              >
+                <IconEdit size={18} />
+              </ActionIcon>
+            </Group>
+          </Card>
         ))}
       </SimpleGrid>
 
@@ -198,7 +223,7 @@ const HouseRulesPage = () => {
             />
           )}
 
-          <Group justify="right">
+          <Group justify="flex-end">
             <Button variant="default" onClick={close}>
               Cancel
             </Button>

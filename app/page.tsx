@@ -183,7 +183,7 @@ export default function MatchesPage() {
           toggleMinimize={toggleMinimize}
           toggleSidebar={toggleSidebar}
           setActiveChat={setActiveChat}
-          className="fixed bottom-4 right-4 md:relative md:bottom-auto md:right-auto"
+          // className="fixed bottom-4 right-4 md:relative md:bottom-auto md:right-auto"
         />
       </div>
     </div>

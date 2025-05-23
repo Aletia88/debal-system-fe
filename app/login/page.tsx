@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
 export default function SignUpPage() {
 
   const [loading, setLoading] = useState(false);
@@ -126,14 +127,19 @@ export default function SignUpPage() {
                     variant="default"
                     radius="md"
                     fullWidth
+                    onClick={()=> router.push(`${baseUrl}api/auth/github`)}
                   >
-                    GitHub
+                   
+         GitHub
+   
+                    
                   </Button>
                   <Button
                     leftSection={<IconBrandGoogle size={20} />}
                     variant="default"
                     radius="md"
                     fullWidth
+                    onClick={()=> router.push(`${baseUrl}api/auth/google`)}
                   >
                     Google
                   </Button>

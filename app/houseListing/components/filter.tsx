@@ -15,32 +15,47 @@ interface FilterProps {
 }
 
 export default function Filter({ onSubmit, currentLocation, onReset }: FilterProps) {
-  const [minPrice, setMinPrice] = useState<number | ''>('');
-  const [maxPrice, setMaxPrice] = useState<number | ''>('');
-  const [bedrooms, setBedrooms] = useState<number | ''>('');
-  const [radius, setRadius] = useState<number | ''>(5);
+  const [minPrice, setMinPrice] = useState<number | undefined>();
+  const [maxPrice, setMaxPrice] = useState<number | undefined>();
+  const [bedrooms, setBedrooms] = useState<number | undefined>();
+  const [radius, setRadius] = useState<number>(5);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const filters: Record<string, any> = {};
+    const filters: {
+      minPrice?: number;
+      maxPrice?: number;
+      bedrooms?: number;
+      location?: string;
+      radius?: number;
+    } = {};
     
-    if (minPrice !== '') filters.minPrice = minPrice;
-    if (maxPrice !== '') filters.maxPrice = maxPrice;
-    if (bedrooms !== '') filters.bedrooms = bedrooms;
+    if (minPrice !== undefined) filters.minPrice = minPrice;
+    if (maxPrice !== undefined) filters.maxPrice = maxPrice;
+    if (bedrooms !== undefined) filters.bedrooms = bedrooms;
     if (currentLocation) {
       filters.location = `${currentLocation.lng},${currentLocation.lat}`;
     }
-    if (radius !== '') filters.radius = radius;
+    if (radius !== undefined) filters.radius = radius;
 
     onSubmit(filters);
   };
 
   const handleReset = () => {
-    setMinPrice('');
-    setMaxPrice('');
-    setBedrooms('');
+    setMinPrice(undefined);
+    setMaxPrice(undefined);
+    setBedrooms(undefined);
     setRadius(5);
     onReset();
+  };
+
+  const handleNumberChange = (value: string | number, setter: (value?: number) => void) => {
+    if (typeof value === 'string') {
+      const num = parseInt(value, 10);
+      setter(isNaN(num) ? undefined : num);
+    } else {
+      setter(value);
+    }
   };
 
   return (
@@ -50,15 +65,15 @@ export default function Filter({ onSubmit, currentLocation, onReset }: FilterPro
           <NumberInput
             label="Min Price"
             value={minPrice}
-            onChange={setMinPrice}
+            onChange={(value) => handleNumberChange(value, setMinPrice)}
             min={0}
             placeholder="Any"
           />
           <NumberInput
             label="Max Price"
             value={maxPrice}
-            onChange={setMaxPrice}
-            min={minPrice !== '' ? minPrice : 0}
+            onChange={(value) => handleNumberChange(value, setMaxPrice)}
+            min={minPrice !== undefined ? minPrice : 0}
             placeholder="Any"
           />
         </Group>
@@ -66,7 +81,7 @@ export default function Filter({ onSubmit, currentLocation, onReset }: FilterPro
         <NumberInput
           label="Bedrooms"
           value={bedrooms}
-          onChange={setBedrooms}
+          onChange={(value) => handleNumberChange(value, setBedrooms)}
           min={0}
           placeholder="Any"
         />
@@ -75,7 +90,14 @@ export default function Filter({ onSubmit, currentLocation, onReset }: FilterPro
           <NumberInput
             label="Radius (km)"
             value={radius}
-            onChange={setRadius}
+            onChange={(value) => {
+              if (typeof value === 'string') {
+                const num = parseInt(value, 10);
+                setRadius(isNaN(num) ? 5 : num);
+              } else {
+                setRadius(value);
+              }
+            }}
             min={1}
             max={100}
           />

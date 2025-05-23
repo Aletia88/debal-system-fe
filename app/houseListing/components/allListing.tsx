@@ -45,7 +45,7 @@ export default function AllListings() {
   if (isError) return <div>Error loading listings</div>;
 
   return (
-    <Box>
+    <Box className=''>
       <Button onClick={open} mb="md">
         Filter Listings
       </Button>

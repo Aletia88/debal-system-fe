@@ -82,6 +82,16 @@ export default function SignUpPage() {
     }
   };
 
+  // function AuthButtons() {
+    const handleGitHubLogin = () => {
+      window.location.href = 'http://localhost:5000/api/auth/github';
+    };
+  
+    const handleGoogleLogin = () => {
+      window.location.href = 'http://localhost:5000/api/auth/google';
+    };
+  // }
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <main className="p-0 md:p-10" style={{ flex: 1, display: 'flex', alignItems: 'center',  }}>
@@ -138,18 +148,21 @@ export default function SignUpPage() {
               <Stack>
                 <Group grow>
                   <Button
+                  onClick={handleGitHubLogin}
                     leftSection={<IconBrandGithub size={20} />}
                     variant="default"
                     radius="md"
                     fullWidth
                   >
                     GitHub
+                    
                   </Button>
                   <Button
                     leftSection={<IconBrandGoogle size={20} />}
                     variant="default"
                     radius="md"
                     fullWidth
+                    onClick={handleGoogleLogin}
                   >
                     Google
                   </Button>

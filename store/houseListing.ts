@@ -36,7 +36,7 @@ export const HouseApi = createApi({
     endpoints: (builder) => ({
 
       createListing: builder.mutation({
-        query: (formData: FormData) => ({
+        query: (formData) => ({
           url: "/list",
           method: "POST",
           body:  formData 
@@ -44,7 +44,7 @@ export const HouseApi = createApi({
         invalidatesTags: ['listing'],
       }),
       createRules: builder.mutation({
-        query: (formData: FormData) => ({
+        query: (formData) => ({
           url: "/house-rules",
           method: "POST",
           body:  formData 
