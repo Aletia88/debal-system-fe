@@ -9,47 +9,55 @@ import { useRouter } from "next/navigation";
 interface Photo {
   url: string;
   isProfile: boolean;
-  // Add other photo properties if needed
+  filename?: string;
+}
+
+interface PersonalInfo {
+  age: number;
+  gender: string;
+  occupation?: string;
+  religion?: string;
+  relationship_status?: string;
+}
+
+interface Lifestyle {
+  personality_type?: string;
+  daily_routine?: string;
+  sleep_pattern?: string;
+}
+
+interface SharedLiving {
+  cleanliness_level?: string;
+  chore_sharing_preference?: string;
+  noise_tolerance?: string;
+  guest_frequency?: string;
+  party_habits?: string;
 }
 
 interface RecommendationUser {
   _id: string;
   name: string;
-  email: string;
+  email?: string;
   photos?: Photo[];
-  personalInfo: {
-    age: number;
-    gender: string;
-    occupation: string;
-    religion: string;
-    relationship_status: string;
-  };
-  lifestyle: {
-    personality_type: string;
-    daily_routine: string;
-    sleep_pattern: string;
-  };
-  hobbies: string[];
-  sharedLiving: {
-    cleanliness_level: string;
-    chore_sharing_preference: string;
-    noise_tolerance: string;
-    guest_frequency: string;
-    party_habits: string;
-  };
+  personalInfo?: PersonalInfo;
+  lifestyle?: Lifestyle;
+  hobbies?: string[];
+  sharedLiving?: SharedLiving;
+}
+
+interface Recommendation {
+  user_id: string;
+  compatibility_score: number;
+  cluster_id?: number;
+  age?: number;
+  gender?: string;
+  personality_type?: string;
+  hobbies?: string[];
+  user: RecommendationUser;
 }
 
 interface MatchCardProps {
-  recommendation: {
-    user_id: string;
-    compatibility_score: number;
-    cluster_id: number;
-    age: number;
-    gender: string;
-    personality_type: string;
-    hobbies: string[];
-    user: RecommendationUser;
-  };
+  recommendation: Recommendation;
   onMessageClick?: (userId: string) => void;
   onLikeToggle?: (userId: string, liked: boolean) => void;
 }
@@ -83,8 +91,8 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
 
   const matchPercentage = Math.round(recommendation.compatibility_score * 100);
   const user = recommendation.user;
-  console.log('user',user)
   const profilePhoto = user?.photos?.find(photo => photo.isProfile);
+  const imageUrl = profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/placeholder-user.png";
 
   return (
     <>
@@ -94,10 +102,13 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
       >
         <div className="relative h-48">
           <Image 
-            src="/image.png" 
-            alt={user.name} 
+            src={imageUrl}
+            alt={user.name || "User profile"} 
             fill 
-            className="object-cover" 
+            className="object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "/placeholder-user.png";
+            }}
           />
           <button 
             className="absolute top-2 left-2 p-2 bg-white/80 rounded-full hover:bg-white"
@@ -123,7 +134,7 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
           </button>
         </div>
         <div className="p-4">
-          <h3 className="font-bold text-lg">{user.user.name}</h3>
+          <h3 className="font-bold text-lg">{user.name}</h3>
           <div className="flex justify-between items-center mt-2">
             <div className="flex items-center">
               <div className="text-orange-400 font-bold">{matchPercentage}%</div>
@@ -134,7 +145,7 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
                 className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleStartChat(user.user._id);
+                  handleStartChat(user._id);
                 }}
               >
                 <MessageCircle size={18} />
@@ -143,7 +154,7 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
                 className="p-2 bg-white border border-gray-300 text-gray-600 rounded-full hover:bg-gray-50"
                 onClick={(e) => {
                   e.stopPropagation();
-                  router.push(`/profile/${user.user._id}`);
+                  router.push(`/profile/${user._id}`);
                 }}
               >
                 <Contact2 size={18} />
@@ -162,10 +173,13 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative h-64 w-full rounded-lg overflow-hidden">
               <Image
-                src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image.png"}
-                alt={user.name}
+                src={imageUrl}
+                alt={user.name || "User profile"}
                 fill
                 className="object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/placeholder-user.png";
+                }}
               />
             </div>
             <div className="space-y-4">
@@ -185,27 +199,35 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
                 </button>
               </div>
               
-              <div>
-                <h4 className="text-sm text-gray-500">Age</h4>
-                <p className="font-medium">{user.personalInfo.age}</p>
-              </div>
+              {user.personalInfo?.age && (
+                <div>
+                  <h4 className="text-sm text-gray-500">Age</h4>
+                  <p className="font-medium">{user.personalInfo.age}</p>
+                </div>
+              )}
               
-              <div>
-                <h4 className="text-sm text-gray-500">Occupation</h4>
-                <p className="font-medium">{user.personalInfo.occupation}</p>
-              </div>
+              {user.personalInfo?.occupation && (
+                <div>
+                  <h4 className="text-sm text-gray-500">Occupation</h4>
+                  <p className="font-medium">{user.personalInfo.occupation}</p>
+                </div>
+              )}
               
-              <div>
-                <h4 className="text-sm text-gray-500">Personality</h4>
-                <p className="font-medium">{user.lifestyle.personality_type}</p>
-              </div>
+              {user.lifestyle?.personality_type && (
+                <div>
+                  <h4 className="text-sm text-gray-500">Personality</h4>
+                  <p className="font-medium">{user.lifestyle.personality_type}</p>
+                </div>
+              )}
               
-              <div>
-                <h4 className="text-sm text-gray-500">Daily Routine</h4>
-                <p className="font-medium">{user.lifestyle.daily_routine}</p>
-              </div>
+              {user.lifestyle?.daily_routine && (
+                <div>
+                  <h4 className="text-sm text-gray-500">Daily Routine</h4>
+                  <p className="font-medium">{user.lifestyle.daily_routine}</p>
+                </div>
+              )}
               
-              {recommendation.hobbies.length > 0 && (
+              {recommendation.hobbies && recommendation.hobbies.length > 0 && (
                 <div>
                   <h4 className="text-sm text-gray-500">Hobbies</h4>
                   <div className="flex flex-wrap gap-2 mt-2">
