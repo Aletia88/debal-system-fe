@@ -96,7 +96,7 @@ const LifestyleInfo = () => {
                 <form onSubmit={form.onSubmit(handleSubmit)}>
                     <Select
                         label="Personality Type"
-                        data={['Introvert', 'Extrovert', 'Ambivert']}
+                        data={['introvert', 'extrovert', 'ambivert']}
                         {...form.getInputProps('personality_type')}
                         mb="md"
                     />
@@ -110,7 +110,7 @@ const LifestyleInfo = () => {
                     
                     <Select
                         label="Sleep Pattern"
-                        data={['Early bird', 'Night owl', 'Flexible']}
+                        data={['early-bird', 'night-owl', 'flexible']}
                         {...form.getInputProps('sleep_pattern')}
                         mb="md"
                     />

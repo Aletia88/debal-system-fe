@@ -63,7 +63,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
         
         <Button
           className="w-full bg-purple-600 hover:bg-purple-700"
-          onClick={() => router.push(`/house/${house._id}`)}
+          onClick={() => router.push(`/houseListing/${house._id}`)}
         >
           View Details
         </Button>

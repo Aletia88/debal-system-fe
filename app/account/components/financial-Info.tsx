@@ -14,13 +14,17 @@ export default function FinancialInfo({ onNext, onBack, initialData }: Financial
   const form = useForm({
     initialValues: {
       income_level: '',
-      budget_min: 1200,
-      budget_max: 1800,
+      budget_range: {
+        min: 2000,
+        max: 3000,
+      },
     },
     validate: {
       income_level: (value) => (value ? null : 'This field is required'),
-      budget_max: (value, values) => 
-        value >= values.budget_min ? null : 'Max budget must be greater than min',
+      budget_range: {
+        max: (value, values) => 
+          value >= values.budget_range.min ? null : 'Max budget must be greater than min',
+      },
     },
   });
 
@@ -37,8 +41,7 @@ export default function FinancialInfo({ onNext, onBack, initialData }: Financial
     if (initialData) {
       form.setValues({
         income_level: initialData.income_level || '',
-        budget_min: initialData.budget_min || 1200,
-        budget_max: initialData.budget_max || 1800,
+        budget_range: initialData.budget_range || { min: 2000, max: 3000 },
       });
     }
   }, [initialData]);
@@ -65,7 +68,7 @@ export default function FinancialInfo({ onNext, onBack, initialData }: Financial
         label="Minimum Budget"
         min={500}
         max={5000}
-        {...form.getInputProps('budget_min')}
+        {...form.getInputProps('budget_range.min')}
         mb="sm"
       />
       
@@ -73,7 +76,7 @@ export default function FinancialInfo({ onNext, onBack, initialData }: Financial
         label="Maximum Budget"
         min={500}
         max={5000}
-        {...form.getInputProps('budget_max')}
+        {...form.getInputProps('budget_range.max')}
         mb="md"
       />
       

@@ -150,7 +150,7 @@ export default function SignUpPage() {
                 <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
                   <Stack>
                     <TextInput
-                      label="User Name"
+                      label="Email"
                       placeholder="Type Your email"
                       {...form.getInputProps("email")}
                       required

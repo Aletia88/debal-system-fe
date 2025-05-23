@@ -50,7 +50,7 @@ export default function FilterSidebar({ onClose, onFiltersApplied }: FilterSideb
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-white p-6 rounded-lg shadow-lg w-full max-w-md overflow-y-auto md:relative md:max-w-xs">
       <div className="flex justify-end mb-8">
         <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
           <X size={24} />

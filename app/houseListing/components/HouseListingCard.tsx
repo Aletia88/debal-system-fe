@@ -52,7 +52,7 @@ export default function HouseListingCard({ listing }: HouseListingCardProps) {
             {listing.title}
           </Text>
           <span className="text-sm font-semibold">
-            {listing.rent.amount} {listing.rent.currency}
+            {listing.rent.amount} BIRR
           </span>
         </div>
         

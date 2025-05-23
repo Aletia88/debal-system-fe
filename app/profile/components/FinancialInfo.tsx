@@ -14,8 +14,7 @@ const FinancialInfo = () => {
     const {data} = useGetProfileByIdQuery(id)
 
     const profile = id ? data : profileD
-
-    const isCurrentUserProfile = id ?  profileD?.user._id === id : true;
+    const isCurrentUserProfile = id ? profileD?.user._id === id : true;
 
     const incomeLevels = [
         'Under 30,000',
@@ -29,13 +28,17 @@ const FinancialInfo = () => {
     const form = useForm({
         initialValues: {
             income_level: '',
-            budget_min: 1200,
-            budget_max: 1800,
+            budget_range: {
+                min: 2000,
+                max: 3000,
+            },
         },
         validate: {
             income_level: (value) => (value ? null : 'This field is required'),
-            budget_max: (value, values) => 
-                value >= values.budget_min ? null : 'Max budget must be greater than min',
+            budget_range: {
+                max: (value, values) => 
+                    value >= values.budget_range.min ? null : 'Max budget must be greater than min',
+            },
         },
     });
 
@@ -43,15 +46,23 @@ const FinancialInfo = () => {
         if (profile?.financial) {
             form.setValues({
                 income_level: profile.financial.income_level || '',
-                budget_min: profile.financial.budget_min || 1200,
-                budget_max: profile.financial.budget_max || 1800,
+                budget_range: {
+                    min: profile.financial.budget_range?.min || 2000,
+                    max: profile.financial.budget_range?.max || 3000,
+                },
             });
         }
     }, [profile]);
 
-    const handleSubmit = async (values:any) => {
+    const handleSubmit = async (values: any) => {
         try {
-            await updateFinancial(values).unwrap();
+            await updateFinancial({
+                income_level: values.income_level,
+                budget_range: {
+                    min: values.budget_range.min,
+                    max: values.budget_range.max,
+                }
+            }).unwrap();
             setModalOpened(false);
         } catch (error) {
             console.error('Failed to update financial info:', error);
@@ -87,11 +98,11 @@ const FinancialInfo = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <h4 className="font-medium">${profile?.financial?.budget_min?.toLocaleString() || '0'}</h4>
+                            <h4 className="font-medium">BIRR {profile?.financial?.budget_range?.min?.toLocaleString() || '0'}</h4>
                             <p className="text-sm text-gray-500">Min Budget</p>
                         </div>
                         <div>
-                            <h4 className="font-medium">${profile?.financial?.budget_max?.toLocaleString() || '0'}</h4>
+                            <h4 className="font-medium">BIRR {profile?.financial?.budget_range?.max?.toLocaleString() || '0'}</h4>
                             <p className="text-sm text-gray-500">Max Budget</p>
                         </div>
                     </div>
@@ -115,7 +126,7 @@ const FinancialInfo = () => {
                         label="Minimum Budget"
                         min={500}
                         max={5000}
-                        {...form.getInputProps('budget_min')}
+                        {...form.getInputProps('budget_range.min')}
                         mb="sm"
                     />
                     
@@ -123,7 +134,7 @@ const FinancialInfo = () => {
                         label="Maximum Budget"
                         min={500}
                         max={5000}
-                        {...form.getInputProps('budget_max')}
+                        {...form.getInputProps('budget_range.max')}
                         mb="md"
                     />
                     
