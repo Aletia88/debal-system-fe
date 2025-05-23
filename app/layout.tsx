@@ -16,7 +16,6 @@ import { Notifications } from "@mantine/notifications";
 import "@mantine/dates/styles.css";
 import '@mantine/notifications/styles.css';
 import { NavbarDemo } from "./components/header";
-import { SocketProvider } from "@/context/socketContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -71,10 +70,10 @@ export default function RootLayout({
         >
           <ModalsProvider>
             <Providers>
-              <SocketProvider>
+              {/* <SocketProvider> */}
              
               {children}
-              </SocketProvider>
+              {/* </SocketProvider> */}
             </Providers>
           </ModalsProvider>
         </MantineProvider>
