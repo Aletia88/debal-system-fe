@@ -72,13 +72,13 @@ export default function MatchesPage() {
           {/* Filter Button */}
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-purple-900">Your Matches</h1>
-            <button 
+            {/* <button 
               onClick={toggleFilter}
               className="flex items-center gap-2 bg-purple-100 hover:bg-purple-200 text-purple-800 px-4 py-2 rounded-lg transition-colors"
             >
               <Filter size={18} />
               Filters
-            </button>
+            </button> */}
           </div>
           
           <p className="text-gray-500 mb-6">Find your perfect roommate match!</p>

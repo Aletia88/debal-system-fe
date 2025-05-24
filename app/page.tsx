@@ -99,13 +99,13 @@ export default function MatchesPage() {
           {/* Filter Button - Adjusted for mobile */}
           <div className="flex justify-between items-center mb-4 sm:mb-6 px-2 sm:px-0">
             <h1 className="text-xl sm:text-2xl font-bold text-purple-900">Find Your Matches</h1>
-            <button 
+            {/* <button 
               onClick={toggleFilter}
               className="flex items-center gap-1 sm:gap-2 bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-1 sm:px-4 sm:py-2 rounded-lg transition-colors text-sm sm:text-base"
             >
               <Filter size={16} className="sm:size-[18px]" />
               <span className="hidden sm:inline">Filters</span>
-            </button>
+            </button> */}
           </div>
           
           <p className="text-gray-500 mb-4 sm:mb-6 px-2 sm:px-0 text-sm sm:text-base">
