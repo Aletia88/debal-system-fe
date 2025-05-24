@@ -18,7 +18,7 @@ const PersonalInfo = () => {
 
     const form = useForm({
         initialValues: {
-            fullname: '',
+            name: '',
             age: '',
             gender: '',
             occupation: '',
@@ -35,7 +35,7 @@ const PersonalInfo = () => {
             }
         },
         validate: {
-            fullname: (value) => (value.trim().length > 0 ? null : 'Full name is required'),
+            name: (value) => (value.trim().length > 0 ? null : 'Full name is required'),
             age: (value) => (value && !isNaN(Number(value)) ? null : 'Please enter a valid age'),
             gender: (value) => (value ? null : 'This field is required'),
             phone_number: (value) => (value.trim().length > 0 ? null : 'Phone number is required'),
@@ -46,7 +46,7 @@ const PersonalInfo = () => {
     useEffect(() => {
         if (profile?.personalInfo) {
             form.setValues({
-                fullname: profile.user.name || '',
+                name: profile.user.name || '',
                 age: profile.personalInfo.age?.toString() || '',
                 gender: profile.personalInfo.gender || '',
                 occupation: profile.personalInfo.occupation || '',
@@ -68,7 +68,7 @@ const PersonalInfo = () => {
     const handleSubmit = async (values: any) => {
         try {
             await updatePersonalInfo({
-                fullname: values.name,
+                name: values.name,
                 age: Number(values.age),
                 gender: values.gender.toLowerCase(),
                 occupation: values.occupation,
@@ -202,7 +202,7 @@ const PersonalInfo = () => {
                     <TextInput
                         label="Full Name"
                         placeholder="Your full name"
-                        {...form.getInputProps('fullname')}
+                        {...form.getInputProps('name')}
                         mb="md"
                         required
                     />
