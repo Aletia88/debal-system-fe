@@ -284,7 +284,7 @@ console.log(photoToDelete)
           <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
             <div className="relative max-w-[90vw] max-h-[90vh]">
               <Image
-                src={` ${profile.photos[selectedImageIndex].url}`}
+                src={`${profile.photos[selectedImageIndex].url}`}
                 alt={`Photo ${selectedImageIndex + 1}`}
                 width={800}
                 height={600}

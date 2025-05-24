@@ -212,7 +212,7 @@ export default function ListingDetailPage() {
             {listing.photos?.length > 0 ? (
               <>
                 <Image
-                  src={` ${listing.photos[selectedImageIndex].url}`}
+                  src={`${listing.photos[selectedImageIndex].url}`}
                   alt={listing.photos[selectedImageIndex].description || 'House listing'}
                   fill
                   className="object-cover"
