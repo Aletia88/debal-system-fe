@@ -33,7 +33,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
     <div className="bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow">
       <div className="relative h-48">
         <Image
-          src={firstPhoto ? ` ${firstPhoto.url}` : "/image.png"}
+          src={firstPhoto ? `${firstPhoto.url}` : "/image.png"}
           alt={house.title}
           fill
           className="object-cover"
