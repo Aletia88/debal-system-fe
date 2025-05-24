@@ -7,6 +7,7 @@ import { useForm } from "@mantine/form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { notifications } from "@mantine/notifications";
 
 export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
@@ -63,25 +64,47 @@ export default function SignUpPage() {
           })
         );
         router.push("/verification");
-      } else {
-        const errorText = await res.text();
-        try {
-          const errorData = JSON.parse(errorText);
-          setError(errorData.detail || "Registration failed");
-          setShowError(true);
-        } catch (err) {
-          setError("Registration failed");
-          setShowError(true);
-        }
-      }
-    } catch (err: any) {
-      setError(err?.message || "An error occurred");
-      setShowError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+      }  else {
+              const errorText = await res.text();
+              try {
+                const errorData = JSON.parse(errorText);
+                console.error("Error Response:", errorData);
+                dispatch(loginFailure(errorData.error || "Registration failed"));
+                setError(errorData.error || "Registration failed");
+                
+                // Show notification for error
+                notifications.show({
+                  title: "Registration Error",
+                  message: errorData.error || "Invalid credentials",
+                  color: "red",
+                });
+              } catch (err) {
+                console.error("Non-JSON Error Response:", errorText);
+                dispatch(loginFailure("Registration failed"));
+                setError("Registration failed");
+                
+                // Show notification for non-JSON error
+                notifications.show({
+                  title: "Registration Error",
+                  message: "Registration failed",
+                  color: "red",
+                });
+              }
+            }
+          } catch (err: any) {
+            console.error("Fetch Error:", err);
+            dispatch(loginFailure("An error occurred"));
+            
+            // Show notification for fetch error
+            notifications.show({
+              title: "Error",
+              message: err?.detail || "An error occurred",
+              color: "red",
+            });
+          } finally {
+            setLoading(false);
+          }
+        };
   // function AuthButtons() {
     const handleGitHubLogin = () => {
       window.location.href = 'http://localhost:5000/api/auth/github';
@@ -146,7 +169,7 @@ export default function SignUpPage() {
               <Title order={2} mb="xl" c="gray.8">Sign Up</Title>
 
               <Stack>
-                <Group grow>
+                {/* <Group grow>
                   <Button
                   onClick={handleGitHubLogin}
                     leftSection={<IconBrandGithub size={20} />}
@@ -166,9 +189,9 @@ export default function SignUpPage() {
                   >
                     Google
                   </Button>
-                </Group>
+                </Group> */}
 
-                <Divider label="OR" labelPosition="center" my="lg" />
+                {/* <Divider label="OR" labelPosition="center" my="lg" /> */}
 
                 <form onSubmit={form.onSubmit(handleSubmit)}>
                   <Stack>

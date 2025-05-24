@@ -7,6 +7,7 @@ import { useForm } from "@mantine/form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { notifications } from "@mantine/notifications";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
 export default function SignUpPage() {
@@ -27,7 +28,7 @@ export default function SignUpPage() {
   });
 
   const handleSubmit = async (values: any) => {
-    console.log("Form values submitted:", values); // Debugging
+    console.log("Form values submitted:", values);
     setLoading(true);
 
     try {
@@ -57,23 +58,42 @@ export default function SignUpPage() {
         try {
           const errorData = JSON.parse(errorText);
           console.error("Error Response:", errorData);
-          dispatch(loginFailure(errorData.detail || "Login failed"));
-          setError(errorData.detail || "Login failed");
+          dispatch(loginFailure(errorData.error || "Login failed"));
+          setError(errorData.error || "Login failed");
+          
+          // Show notification for error
+          notifications.show({
+            title: "Login Error",
+            message: errorData.error || "Invalid credentials",
+            color: "red",
+          });
         } catch (err) {
           console.error("Non-JSON Error Response:", errorText);
           dispatch(loginFailure("Login failed"));
           setError("Login failed");
+          
+          // Show notification for non-JSON error
+          notifications.show({
+            title: "Login Error",
+            message: "Login failed",
+            color: "red",
+          });
         }
       }
     } catch (err: any) {
       console.error("Fetch Error:", err);
       dispatch(loginFailure("An error occurred"));
-      // notify("Error", err?.detail || "An error occurred");
+      
+      // Show notification for fetch error
+      notifications.show({
+        title: "Error",
+        message: err?.detail || "An error occurred",
+        color: "red",
+      });
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <main className="p-0 md:p-10" style={{ flex: 1, display: 'flex', alignItems: 'center',  }}>
@@ -121,7 +141,7 @@ export default function SignUpPage() {
               <Title order={2} mb="xl" c="gray.8">Sign In</Title>
 
               <Stack>
-                <Group grow>
+                {/* <Group grow>
                   <Button
                     leftSection={<IconBrandGithub size={20} />}
                     variant="default"
@@ -143,9 +163,9 @@ export default function SignUpPage() {
                   >
                     Google
                   </Button>
-                </Group>
+                </Group> */}
 
-                <Divider label="OR" labelPosition="center" my="lg" />
+                {/* <Divider label="OR" labelPosition="center" my="lg" /> */}
 
                 <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
                   <Stack>

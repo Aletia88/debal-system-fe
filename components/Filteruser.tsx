@@ -58,6 +58,7 @@ interface Recommendation {
   name?: string;
   occupation?: string;
   religion?: string;
+  photos?: Photo[];
 }
 
 interface MatchCardProps {
@@ -93,7 +94,7 @@ export const FilterUser = ({ recommendation, onMessageClick, onLikeToggle }: Mat
     }
   };
 
-  const profilePhoto = recommendation.user?.photos?.find(photo => photo.isProfile);
+  const profilePhoto = recommendation.photos?.find(photo => photo.isProfile);
   const name = recommendation.user?.name || recommendation.name;
   const age = recommendation.user?.personalInfo?.age || recommendation.age;
   const gender = recommendation.user?.personalInfo?.gender || recommendation.gender;
@@ -101,15 +102,17 @@ export const FilterUser = ({ recommendation, onMessageClick, onLikeToggle }: Mat
   const religion = recommendation.user?.personalInfo?.religion || recommendation.religion;
   const hobbies = recommendation.user?.hobbies || recommendation.hobbies || [];
 
+  console.log(profilePhoto?.url)
+
   return (
     <>
       <div 
         className="bg-white rounded-lg shadow overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
         onClick={handleCardClick}
       >
-        <div className="relative h-48">
+        <div className="relative h-72">
           <Image 
-            src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image"}
+            src={profilePhoto ? ` ${profilePhoto.url}` : "/image"}
             alt={profilePhoto?.filename || "Profile image"} 
             fill 
             className="object-cover" 
@@ -173,7 +176,7 @@ export const FilterUser = ({ recommendation, onMessageClick, onLikeToggle }: Mat
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative h-64 w-full rounded-lg overflow-hidden">
               <Image
-                src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image"}
+                src={profilePhoto ? `${profilePhoto.url}` : "/image"}
                 alt={name || "Profile image"}
                 fill
                 className="object-cover"

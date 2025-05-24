@@ -19,6 +19,7 @@ import { useForm } from '@mantine/form';
 import { IconUpload, IconCheck, IconAlertCircle } from '@tabler/icons-react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { useGetProfileQuery } from '@/store/profile';
 
 const VerificationPage = () => {
   const [frontImage, setFrontImage] = useState<File | null>(null);
@@ -29,6 +30,9 @@ const VerificationPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter()
+  const {data: profile} = useGetProfileQuery({})
+
+  // const isVerfied 
 
   const form = useForm({
     initialValues: {

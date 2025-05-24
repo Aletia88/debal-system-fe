@@ -212,7 +212,7 @@ export default function ListingDetailPage() {
             {listing.photos?.length > 0 ? (
               <>
                 <Image
-                  src={`${baseUrl}${listing.photos[selectedImageIndex].url}`}
+                  src={` ${listing.photos[selectedImageIndex].url}`}
                   alt={listing.photos[selectedImageIndex].description || 'House listing'}
                   fill
                   className="object-cover"
@@ -247,7 +247,7 @@ export default function ListingDetailPage() {
                     className={`relative h-20 w-20 flex-shrink-0 rounded-md overflow-hidden ${selectedImageIndex === index ? 'ring-2 ring-blue-500' : ''}`}
                   >
                     <Image
-                      src={`${baseUrl}${photo.url}`}
+                      src={` ${photo.url}`}
                       alt={photo.description || `Thumbnail ${index + 1}`}
                       fill
                       className="object-cover"

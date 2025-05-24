@@ -24,10 +24,12 @@ import { useToast } from "@/hooks/use-toast"
 import Image from "next/image"
 import { useDisclosure } from "@mantine/hooks"
 import ProfileInfo from "./components/ProviderInfo"
+import { useRouter } from "next/navigation"
+import GuarantorInfo from "./components/GuranteeInfo"
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
 export default function ProfilePage() {
-  const { data: profile } = useGetProfileQuery({})
+  const { data: profile, refetch } = useGetProfileQuery({})
   const [uploadPhotos] = useSetProfilePhotoMutation()
   // const [deletePhoto] = useRemoveProfilePhotoMutation()
   const [updateProfilePhoto] = useUpdateProfilePhotoMutation()
@@ -42,9 +44,10 @@ export default function ProfilePage() {
   const [isViewerOpen, setIsViewerOpen] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const [opened, { open, close }] = useDisclosure(false);
+  const router = useRouter()
 
   const profilePhoto = profile?.photos?.find((photo:any) => photo.isProfile);
-  // console.log(`${baseUrl}${profilePhoto?.url}`)
+  // console.log(` ${profilePhoto?.url}`)
 
   const [removeProfilePhoto] = useRemoveProfilePhotoMutation();
 
@@ -59,7 +62,7 @@ export default function ProfilePage() {
     setPhotoToDelete(filename);
     open();
   };
-
+console.log(photoToDelete)
   const confirmDelete = async () => {
     if (!photoToDelete) return;
 
@@ -82,12 +85,13 @@ export default function ProfilePage() {
   };
   const handleSetProfilePhoto = async (filename: string) => {
     try {
-      await uploadPhotos(filename).unwrap(); // Now passing just the filename
+      await uploadPhotos(filename).unwrap(); // Changed from uploadPhotos to setProfilePhoto
       toast({
         title: "Success",
         description: "Profile photo updated successfully",
       });
       setIsViewerOpen(false);
+      await refetch();
     } catch (error:any) {
       toast({
         title: "Failed to update profile photo",
@@ -120,6 +124,7 @@ export default function ProfilePage() {
         description: "Photos uploaded successfully",
       })
       setFiles([])
+      await refetch();
     } catch (error:any) {
       toast({
         title: "Upload failed",
@@ -141,7 +146,7 @@ export default function ProfilePage() {
         <div className="absolute left-1/2 -top-12 transform -translate-x-1/2">
           <Avatar className="h-24 w-24 border-4 border-white bg-cover">
             <AvatarImage
-              src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image.png"}
+              src={profilePhoto ? `${profilePhoto.url}` : "/image.png"}
               alt="Profile"
             />
             <AvatarFallback>
@@ -152,32 +157,37 @@ export default function ProfilePage() {
         <div className="mt-12">
           <h2 className="text-xl font-semibold">{profile?.user.name}</h2>
           <p className="text-purple-200 text-sm">{profile?.user.email}</p>
-
           <div className="mt-2 flex justify-center gap-2 flex-wrap">
-                      {!profile?.user.isVerified && (
-                        // <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center">
-                         
-                        // </span>
-                        <Badge color="yellow" variant="light"> Not Verified</Badge>
-                      )}
-                      {profile?.user.isblocked && (
-                        
-                         <Badge color="red" variant="light"> Blocked</Badge>
-                      )}
-                      {profile?.user.issuspended && (
-                       
-                        <Badge color="orange" variant="light"> Suspended</Badge>
-                      )}
-                      {profile?.user.isdeleted && (
-                      
-                        <Badge color="gray" variant="light"> Deleted</Badge>
-                      )}
-                      {profile?.user.isreported && (
-                       
-                        <Badge color="purple" variant="light"> Reported</Badge>
-                      )}
-                    </div>
-
+      {profile?.personalInfo?.verification_status === 'notVerified' && (
+        <div className="flex items-center gap-2">
+          <Badge color="yellow" variant="light">Not Verified</Badge>
+          <button 
+            onClick={() => router.push('/verification')}
+            className="text-xs bg-white text-purple-900 px-2 py-1 rounded hover:bg-gray-100"
+          >
+            Verify Now
+          </button>
+        </div>
+      )}
+      {profile?.personalInfo?.verification_status === 'pending' && (
+        <Badge color="blue" variant="light">Verification Pending</Badge>
+      )}
+      {profile?.personalInfo?.verification_status === 'verified' && (
+        <Badge color="green" variant="light">Verified</Badge>
+      )}
+      {profile?.user.isblocked && (
+        <Badge color="red" variant="light">Blocked</Badge>
+      )}
+      {profile?.user.issuspended && (
+        <Badge color="orange" variant="light">Suspended</Badge>
+      )}
+      {profile?.user.isdeleted && (
+        <Badge color="gray" variant="light">Deleted</Badge>
+      )}
+      {profile?.user.isreported && (
+        <Badge color="purple" variant="light">Reported</Badge>
+      )}
+    </div>
           <div className="flex justify-center mt-4 space-x-4">
             <button className="bg-purple-800 p-2 rounded-full hover:bg-purple-700">
               <Twitter size={20} />
@@ -222,8 +232,8 @@ export default function ProfilePage() {
               {profile.photos.map((photo:any, index:any) => (
                 <div key={photo.id || index} className="relative group">
                   <Image
-                    src={`${baseUrl}${photo.url}`}
-                    alt={`${baseUrl}`}
+                    src={`${photo.url}`}
+                    alt={` `}
                     width={96}
                     height={96}
                     className="w-24 h-24 rounded-md object-cover cursor-pointer border-2 border-transparent hover:border-purple-500 transition-all"
@@ -274,7 +284,7 @@ export default function ProfilePage() {
           <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
             <div className="relative max-w-[90vw] max-h-[90vh]">
               <Image
-                src={`${baseUrl}${profile.photos[selectedImageIndex].url}`}
+                src={` ${profile.photos[selectedImageIndex].url}`}
                 alt={`Photo ${selectedImageIndex + 1}`}
                 width={800}
                 height={600}
@@ -328,7 +338,7 @@ export default function ProfilePage() {
         </SimpleGrid>:
         <SimpleGrid cols={{ base: 1, sm: 2,  }}>
           <Stack><PersonalInfo /><NeighborhoodInfo /> <WorkInfo /> <HobbiesInfo /> <PetsInfo /></Stack>
-          <Stack><LifestyleInfo /> <FoodInfo /> <FinancialInfo /> <SharedLivingInfo /></Stack>
+          <Stack><LifestyleInfo /> <FoodInfo /> <FinancialInfo /> <SharedLivingInfo /><GuarantorInfo /></Stack>
         </SimpleGrid>}
         <Modal
           opened={opened}

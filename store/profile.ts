@@ -52,6 +52,14 @@ export const ProfileApi = createApi({
             query: () =>`/profiles/recommendations`,
             providesTags: ["profiles"],
         }),
+        getGarantorProfileById: builder.query({
+            query: (id) =>`/gurantor/user/${id}`,
+            providesTags: ["profiles"],
+        }),
+        getGetGarantorProfile: builder.query({
+            query: () =>`/gurantor/user`,
+            providesTags: ["profiles"],
+        }),
         getHouseFeeds: builder.query({
             query: () =>`/list/get/feed`,
             providesTags: ["profiles"],
@@ -193,16 +201,17 @@ export const ProfileApi = createApi({
           }),
           setProfilePhoto: builder.mutation<void, string>({
             query: (filename) => ({
-              url: `/profiles/profile/photo/set-profile/${filename}`,
-              method: "PATCH",
-              
+                url: `/profiles/profile/photo/set-profile`, // Updated endpoint
+                method: "PATCH",
+                body: { filename } // Send filename in the body
             }),
             invalidatesTags: ["profiles"],
-          }),
+        }),
           RemoveProfilePhoto: builder.mutation<void, string>({
             query: (filename) => ({
-              url: `profiles/profile/photo/${filename}`,
+              url: `profiles/profile/photo`,
               method: "DELETE",
+              body:{filename}
               
             }),
             invalidatesTags: ["profiles"],
@@ -235,5 +244,7 @@ export const {
     useGetRecommendationQuery,
     useRegisterProviderMutation,
     useGetFilteredUsersQuery,
-    useGetHouseFeedsQuery
+    useGetHouseFeedsQuery,
+    useGetGarantorProfileByIdQuery,
+    useGetGetGarantorProfileQuery
 } = ProfileApi;

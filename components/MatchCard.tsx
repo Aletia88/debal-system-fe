@@ -10,14 +10,31 @@ interface Photo {
   url: string;
   isProfile: boolean;
   filename?: string;
+  mimetype?: string;
+  _id?: string;
+}
+
+interface User {
+  _id: string;
+  name: string;
+  email?: string;
+  role?: string;
+  isOnline?: boolean;
+  isVerified?: boolean;
+  isblocked?: boolean;
+  issuspended?: boolean;
+  isdeleted?: boolean;
+  isreported?: boolean;
 }
 
 interface PersonalInfo {
-  age: number;
-  gender: string;
+  age?: number;
+  gender?: string;
   occupation?: string;
   religion?: string;
   relationship_status?: string;
+  social_media_links?: Record<string, string>;
+  verification_status?: 'notVerified' | 'pending' | 'verified';
 }
 
 interface Lifestyle {
@@ -35,14 +52,13 @@ interface SharedLiving {
 }
 
 interface RecommendationUser {
-  _id: string;
-  name: string;
-  email?: string;
-  photos?: Photo[];
+  user: User;
   personalInfo?: PersonalInfo;
   lifestyle?: Lifestyle;
   hobbies?: string[];
   sharedLiving?: SharedLiving;
+  photos?: Photo[];
+  form_completed?: boolean;
 }
 
 interface Recommendation {
@@ -61,13 +77,12 @@ interface MatchCardProps {
   onMessageClick?: (userId: string) => void;
   onLikeToggle?: (userId: string, liked: boolean) => void;
 }
-
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
 export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: MatchCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
-  
+
   const handleStartChat = (id: string) => {
     router.push(`/chat?newChat=${id}`);
   };
@@ -92,7 +107,8 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
   const matchPercentage = Math.round(recommendation.compatibility_score * 100);
   const user = recommendation.user;
   const profilePhoto = user?.photos?.find(photo => photo.isProfile);
-  const imageUrl = profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/placeholder-user.png";
+  const imageUrl = profilePhoto ? `${profilePhoto.url}` : "/placeholder-user.png";
+  console.log(imageUrl)
 
   return (
     <>
@@ -103,12 +119,12 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
         <div className="relative h-48">
           <Image 
             src={imageUrl}
-            alt={user.name || "User profile"} 
+            alt={user.user.name || "User profile"} 
             fill 
             className="object-cover"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = "/placeholder-user.png";
-            }}
+            // onError={(e) => {
+            //   (e.target as HTMLImageElement).src = "/placeholder-user.png";
+            // }}
           />
           <button 
             className="absolute top-2 left-2 p-2 bg-white/80 rounded-full hover:bg-white"
@@ -134,7 +150,7 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
           </button>
         </div>
         <div className="p-4">
-          <h3 className="font-bold text-lg">{user.name}</h3>
+          <h3 className="font-bold text-lg">{user.user.name}</h3>
           <div className="flex justify-between items-center mt-2">
             <div className="flex items-center">
               <div className="text-orange-400 font-bold">{matchPercentage}%</div>
@@ -145,7 +161,7 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
                 className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleStartChat(user._id);
+                  handleStartChat(user.user._id);
                 }}
               >
                 <MessageCircle size={18} />
@@ -154,7 +170,7 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
                 className="p-2 bg-white border border-gray-300 text-gray-600 rounded-full hover:bg-gray-50"
                 onClick={(e) => {
                   e.stopPropagation();
-                  router.push(`/profile/${user._id}`);
+                  router.push(`/profile/${user.user._id}`);
                 }}
               >
                 <Contact2 size={18} />
@@ -168,18 +184,18 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-md md:max-w-xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl">{user.name}</DialogTitle>
+            <DialogTitle className="text-2xl">{user.user.name}</DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative h-64 w-full rounded-lg overflow-hidden">
               <Image
                 src={imageUrl}
-                alt={user.name || "User profile"}
+                alt={user.user.name || "User profile"}
                 fill
                 className="object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/placeholder-user.png";
-                }}
+                // onError={(e) => {
+                //   (e.target as HTMLImageElement).src = "/placeholder-user.png";
+                // }}
               />
             </div>
             <div className="space-y-4">
@@ -248,14 +264,14 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
                   className="flex-1 flex items-center justify-center gap-2 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700"
                   onClick={() => {
                     closeModal();
-                    handleStartChat(user._id);
+                    handleStartChat(user.user._id);
                   }}
                 >
                   <MessageCircle size={18} />
                   Message
                 </button>
                 <button 
-                  onClick={() => router.push(`/profile/${user._id}`)} 
+                  onClick={() => router.push(`/profile/${user.user._id}`)} 
                   className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50"
                 >
                   <Contact2 size={18} />

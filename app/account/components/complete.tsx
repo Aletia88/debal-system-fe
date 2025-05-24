@@ -1,5 +1,6 @@
 import { Button, Group, Card, Text, Title, Center } from '@mantine/core';
 import { useMarkCompleteMutation } from '@/store/profile';
+import { useRouter } from 'next/navigation';
 
 interface CompleteMessageProps {
   onBack: () => void;
@@ -7,6 +8,7 @@ interface CompleteMessageProps {
 
 export default function CompleteMessage({ onBack }: CompleteMessageProps) {
   const [markComplete, { isLoading, isSuccess, isError }] = useMarkCompleteMutation();
+  const router = useRouter()
 
   const handleComplete = async () => {
     try {
@@ -63,8 +65,8 @@ export default function CompleteMessage({ onBack }: CompleteMessageProps) {
             </>
           )}
           {isSuccess && (
-            <Button component="a" href="/profile">
-              Go to Dashboard
+            <Button component="a" href="/">
+              Go to Home
             </Button>
           )}
         </Group>

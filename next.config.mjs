@@ -12,6 +12,11 @@ const nextConfig = {
           hostname: 'debal-api.onrender.com',
           pathname: '/**',
         },
+        {
+          protocol: 'https',
+          hostname: 'res.cloudinary.com',
+          pathname: '/**',
+        },
       ],
       
     },

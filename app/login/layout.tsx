@@ -2,11 +2,10 @@ import type React from "react"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "My Profile | Debal",
-  description: "View and edit your profile information",
+  title: "Login | Debal",
 }
 
-export default function ProfileLayout({
+export default function LoginLayout({
   children,
 }: {
   children: React.ReactNode

@@ -12,7 +12,7 @@ export default function PersonalInfo({ onNext, initialData }: PersonalInfoProps)
   const [updatePersonalInfo, { isLoading }] = useUpdatePersonalInfoMutation();
   const form = useForm({
     initialValues: {
-      fullname: '',
+      name: '',
       age: '',
       gender: '',
       occupation: '',
@@ -29,7 +29,7 @@ export default function PersonalInfo({ onNext, initialData }: PersonalInfoProps)
       }
     },
     validate: {
-      fullname: (value) => (value.trim().length > 0 ? null : 'Full name is required'),
+      name: (value) => (value.trim().length > 0 ? null : 'Full name is required'),
       age: (value) => (value && !isNaN(Number(value)) ? null : 'Please enter a valid age'),
       gender: (value) => (value ? null : 'This field is required'),
       phone_number: (value) => (value.trim().length > 0 ? null : 'Phone number is required'),
@@ -39,7 +39,7 @@ export default function PersonalInfo({ onNext, initialData }: PersonalInfoProps)
   useEffect(() => {
     if (initialData) {
       form.setValues({
-        fullname: initialData.fullname || '',
+        name: initialData.name || '',
         age: initialData.age?.toString() || '',
         gender: initialData.gender || '',
         occupation: initialData.occupation || '',
@@ -61,7 +61,7 @@ export default function PersonalInfo({ onNext, initialData }: PersonalInfoProps)
   const handleSubmit = async (values: any) => {
     try {
       await updatePersonalInfo({
-        fullname: values.fullname,
+        name: values.name,
         age: Number(values.age),
         gender: values.gender.toLowerCase(),
         occupation: values.occupation,
@@ -87,7 +87,7 @@ export default function PersonalInfo({ onNext, initialData }: PersonalInfoProps)
     <form onSubmit={form.onSubmit(handleSubmit)}>
       <TextInput
         label="Full Name"
-        {...form.getInputProps('fullname')}
+        {...form.getInputProps('name')}
         mb="md"
         required
       />
@@ -128,8 +128,10 @@ export default function PersonalInfo({ onNext, initialData }: PersonalInfoProps)
       >
         <Group mt="xs">
           <Radio value="single" label="Single" />
-          <Radio value="in_relationship" label="In a relationship" />
+          <Radio value="in-a-relationship" label="In a relationship" />
           <Radio value="married" label="Married" />
+          <Radio value="divorced" label="Divorced" />
+          <Radio value="widowed" label="Widowed" />
         </Group>
       </Radio.Group>
       

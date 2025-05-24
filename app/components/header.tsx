@@ -79,7 +79,7 @@ export function NavbarDemo() {
                    */}
                    <Avatar className="h-8 w-8  bg-cover">
             <AvatarImage
-              src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image.png"}
+              src={profilePhoto ? ` ${profilePhoto.url}` : "/image.png"}
               alt="Profile"
             />
             <AvatarFallback>

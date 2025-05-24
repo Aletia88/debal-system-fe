@@ -19,7 +19,7 @@ import ProfileInfo from "../components/ProviderInfo"
 import { useForm } from "@mantine/form"
 import { showNotification } from "@mantine/notifications"
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_OR;
+
 const ProfileDetail = () => {
   const { id } = useParams()
   const { data: profile } = useGetProfileByIdQuery(id)
@@ -71,7 +71,7 @@ const ProfileDetail = () => {
 
   const handleSubmitFeedback = async (values: any) => {
     try {
-      const response = await fetch(`${baseUrl}api/feedbacks`, {
+      const response = await fetch(` api/feedbacks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ const ProfileDetail = () => {
 
   const handleSubmitReport = async (values: any) => {
     try {
-      const response = await fetch(`${baseUrl}api/feedbacks/report`, {
+      const response = await fetch(` api/feedbacks/report`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ const ProfileDetail = () => {
         <div className="absolute left-1/2 -top-12 transform -translate-x-1/2">
           <Avatar className="h-24 w-24 border-4 border-white bg-cover">
             <AvatarImage
-              src={profilePhoto ? `${baseUrl}${profilePhoto.url}` : "/image.png"}
+              src={profilePhoto ? ` ${profilePhoto.url}` : "/image.png"}
               alt="Profile"
             />
             <AvatarFallback>
@@ -226,8 +226,8 @@ const ProfileDetail = () => {
             {profile?.photos.map((photo: any, index: any) => (
               <div key={photo.id || index} className="relative group">
                 <Image
-                  src={`${baseUrl}${photo.url}`}
-                  alt={`${baseUrl}`}
+                  src={` ${photo.url}`}
+                  alt={` `}
                   width={96}
                   height={96}
                   className="w-24 h-24 rounded-md object-cover cursor-pointer border-2 border-transparent hover:border-purple-500 transition-all"
@@ -246,7 +246,7 @@ const ProfileDetail = () => {
           <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
             <div className="relative max-w-[90vw] max-h-[90vh]">
               <Image
-                src={`${baseUrl}${profile.photos[selectedImageIndex].url}`}
+                src={` ${profile.photos[selectedImageIndex].url}`}
                 alt={`Photo ${selectedImageIndex + 1}`}
                 width={800}
                 height={600}
