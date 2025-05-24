@@ -135,7 +135,7 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
           >
             <Eye size={18} />
           </button>
-          <button 
+          {/* <button 
             className="absolute top-2 right-2 p-2 bg-white/80 rounded-full hover:bg-white"
             onClick={(e) => {
               e.stopPropagation();
@@ -147,7 +147,7 @@ export const MatchCard = ({ recommendation, onMessageClick, onLikeToggle }: Matc
               fill={isLiked ? "red" : "none"} 
               color={isLiked ? "red" : "currentColor"} 
             />
-          </button>
+          </button> */}
         </div>
         <div className="p-4">
           <h3 className="font-bold text-lg">{user.user.name}</h3>
