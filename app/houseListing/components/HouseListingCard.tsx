@@ -32,7 +32,7 @@ export default function HouseListingCard({ listing }: HouseListingCardProps) {
       {listing.photos && listing.photos.length > 0 ? (
         <div className="relative h-48 w-full">
           <Image
-            src={` ${listing.photos[0].url}`}
+            src={`${listing.photos[0].url}`}
             alt={listing.photos[0].description || 'House listing'}
             fill
             className="object-cover"
