@@ -112,7 +112,7 @@ export const FilterUser = ({ recommendation, onMessageClick, onLikeToggle }: Mat
       >
         <div className="relative h-72">
           <Image 
-            src={profilePhoto ? ` ${profilePhoto.url}` : "/image"}
+            src={profilePhoto ? `${profilePhoto.url}` : "/image"}
             alt={profilePhoto?.filename || "Profile image"} 
             fill 
             className="object-cover" 
